@@ -25,6 +25,28 @@ dev = [
     "mypy>=1.19.1",
 ]
 
+[tool.ruff]
+exclude      = ["*venv*", "build", "dist"] # Basic patterns for exclusion
+indent-width = 4                           # Like Black, set the default line width indentation to 4
+line-length  = 88                          # Like Black, set the default max line lenght to 88
+
+[tool.ruff.lint]
+ignore = ["E501"]
+# E: pycodestyle
+# F: Pyflakes
+# I: isort
+# UP: pyupgrade
+select = ["E", "F", "I", "UP"]
+
+[tool.ruff.format]
+indent-style              = "space"  # Like Black, indent with spaces rather than tabs
+line-ending               = "auto"   # Automatically detect the appropriate line ending.
+quote-style               = "double" # Like Black, use double quotes for strings.
+skip-magic-trailing-comma = false    # Like Black, respect magic trailing commas.
+
+[tool.ty.environment]
+extra-paths = ["src"]
+
 [tool.mypy]
 mypy_path = "src"
 explicit_package_bases = true
@@ -33,3 +55,10 @@ explicit_package_bases = true
 module = ["mongoengine", "mongoengine.*"]
 ignore_missing_imports = true
 follow_untyped_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "services",
+    "services.users_service"
+]
+disable_error_code = ["attr-defined"]

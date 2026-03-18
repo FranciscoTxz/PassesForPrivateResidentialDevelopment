@@ -1,11 +1,26 @@
-from commons.exceptions_handler import register_exception_handlers
-from commons.log_helper import get_logger
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from commons.exceptions_handler import register_exception_handlers
+from commons.log_helper import get_logger
+from routers import auth_router, users_router
+from services import connect_to_mongodb, disconnect_from_mongodb
+
 _LOG = get_logger(__name__)
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    connect_to_mongodb()
+
+    yield
+
+    disconnect_from_mongodb()
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,  # ty:ignore
@@ -16,6 +31,9 @@ app.add_middleware(
 )
 
 register_exception_handlers(app)
+
+app.include_router(router=auth_router)
+app.include_router(router=users_router)
 
 
 @app.get("/")
