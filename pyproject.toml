@@ -55,3 +55,10 @@ explicit_package_bases = true
 module = ["mongoengine", "mongoengine.*"]
 ignore_missing_imports = true
 follow_untyped_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "services",
+    "services.users_service"
+]
+disable_error_code = ["attr-defined"]
