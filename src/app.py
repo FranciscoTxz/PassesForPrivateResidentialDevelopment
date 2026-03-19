@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from commons.exceptions_handler import register_exception_handlers
 from commons.log_helper import get_logger
-from routers import auth_router, users_router
+from routers import auth_router, houses_router, profile_router, users_router
 from services import connect_to_mongodb, disconnect_from_mongodb
 
 _LOG = get_logger(__name__)
@@ -34,6 +34,8 @@ register_exception_handlers(app)
 
 app.include_router(router=auth_router)
 app.include_router(router=users_router)
+app.include_router(router=profile_router)
+app.include_router(router=houses_router)
 
 
 @app.get("/")
