@@ -18,7 +18,7 @@ class LogInUser(BaseModel):
     password: str = Field(..., min_length=8, max_length=16)
 
 
-class SignUpUser(LogInUser):
+class SignUpUser(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=8, max_length=16)
     first_name: str = Field(..., min_length=2, max_length=50)
@@ -88,3 +88,47 @@ class UserInfo(BaseModel):
     full_name: str
     enabled: bool
     house_id: str | None
+    role: str | None
+
+
+class UserNamePhone(BaseModel):
+    first_name: str | None = Field(None, min_length=2, max_length=50)
+    last_name: str | None = Field(None, min_length=2, max_length=50)
+    phone_number: str | None = Field(None, min_length=11, max_length=13)
+
+    @field_validator("first_name", "last_name")
+    def name_must_be_alpha(cls, v: str):
+        def is_latin(c: str) -> bool:
+            try:
+                return "LATIN" in unicodedata.name(c)
+            except ValueError:
+                return False
+
+        if not v or all(c.isspace() or is_latin(c) for c in v):
+            return v
+        raise HTTPException(
+            status_code=400, detail="Name must contain only Latin alphabetic characters"
+        )
+
+    @field_validator("phone_number")
+    def phone_must_be_polish_format(cls, v: str):
+        if not PHONE_RE.fullmatch(v.strip()):
+            raise HTTPException(
+                status_code=400,
+                detail="Phone number must be in the format that begins with '+' followed by 10 to 12 digits",
+            )
+        return v
+
+
+class UserPasswordUpdate(BaseModel):
+    old_password: str = Field(..., min_length=8, max_length=16)
+    new_password: str = Field(..., min_length=8, max_length=16)
+
+    @field_validator("new_password")
+    def password_must_have(cls, v: str):
+        if not PASSWORD_WHITELIST.fullmatch(v):
+            raise HTTPException(
+                status_code=400,
+                detail=PASSWORD_REJECT,
+            )
+        return v

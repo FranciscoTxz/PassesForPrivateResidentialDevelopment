@@ -6,7 +6,7 @@ from schemas.users_schema import UserInfo
 from services.users_service import UserService
 
 
-def get_current_user_info(validate_owner: bool = False):
+def get_current_user_info(validate_owner: bool = False, validate_admin: bool = False):
     def verify_token(authorization: str = Header(None)) -> UserInfo:
         try:
             attributes = jwt.decode(authorization, SECRET_KEY, algorithms=["HS256"])
@@ -28,6 +28,12 @@ def get_current_user_info(validate_owner: bool = False):
                 raise HTTPException(
                     status_code=403,
                     detail="Forbidden: User does not have a house assigned",
+                )
+
+            if validate_admin and user_info.role != "admin":
+                raise HTTPException(
+                    status_code=403,
+                    detail="Forbidden: User does not have the required role",
                 )
 
             return user_info

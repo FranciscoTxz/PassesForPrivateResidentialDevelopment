@@ -15,5 +15,6 @@ class Users(Document):
     created_at = DateTimeField(default=datetime.now)
     updated_at = DateTimeField(default=None)
     house_id = StringField(default=None)
+    role = StringField(default="user")
 
-    meta = {"collection": "users", "indexes": ["full_name", "phone_number"]}
+    meta = {"collection": "users", "indexes": ["full_name", "house_id"]}
