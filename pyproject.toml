@@ -9,6 +9,9 @@ dependencies = [
     "mongoengine>=0.29.3",
     "pydantic[email]>=2.12.5",
     "pyjwt>=2.12.1",
+    "pypng>=0.20220715.0",
+    "qrcode[pil]>=8.2",
+    "types-qrcode>=8.2.0.20250914",
     "uvicorn>=0.42.0",
 ]
 
@@ -60,6 +63,7 @@ follow_untyped_imports = true
 module = [
     "services",
     "services.users_service",
-    "services.houses_service"
+    "services.houses_service",
+    "services.passes_service"
 ]
 disable_error_code = ["attr-defined"]
