@@ -1,10 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 
 from commons.auth import get_current_user_info
 from schemas.users_schema import UserInfo
 from services.users_service import UserService
-
-EMAIL_CONST = "Missing query parameter 'email'"
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -43,51 +41,37 @@ def make_user_admin(
     email: str = Query(...),
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
 ):
-    if not email:
-        raise HTTPException(status_code=400, detail=EMAIL_CONST)
     return UserService.make_user_admin(email)
 
 
 @router.patch("/disable", status_code=200)
 def disable_staff(
-    email: str | None = Query(default=None),
+    email: str = Query(...),
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
 ):
-    if not email:
-        raise HTTPException(status_code=400, detail=EMAIL_CONST)
     return UserService.disable_user(user_id=email)
 
 
 @router.patch("/enable", status_code=200)
 def enable_staff(
-    email: str | None = Query(default=None),
+    email: str = Query(...),
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
 ):
-    if not email:
-        raise HTTPException(status_code=400, detail=EMAIL_CONST)
     return UserService.enable_user(user_id=email)
 
 
 @router.delete("/delete", status_code=204)
 def delete_staff(
-    email: str | None = Query(default=None),
+    email: str = Query(...),
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
 ):
-    if not email:
-        raise HTTPException(status_code=400, detail=EMAIL_CONST)
     UserService.delete_user(user_id=email)
 
 
 @router.patch("/link", status_code=200)
 def link_house(
-    email: str | None = Query(default=None),
-    house_id: str | None = Query(default=None),
+    email: str = Query(...),
+    house_id: str = Query(...),
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
 ):
-    if not email:
-        raise HTTPException(status_code=400, detail=EMAIL_CONST)
-    if not house_id:
-        raise HTTPException(
-            status_code=400, detail="Missing query parameter 'house_id'"
-        )
     return UserService.link_house(email=email, house_id=house_id)

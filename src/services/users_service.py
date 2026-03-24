@@ -70,7 +70,7 @@ class UserService:
             )
             user.save()
 
-            return {"result": "User registered successfully."}
+            return {"message": "User registered successfully."}
 
     @staticmethod
     def login_user(email: str, password: str):
@@ -141,7 +141,7 @@ class UserService:
         user.save()
         user.reload()
         return {
-            "result": "Profile updated successfully.",
+            "message": "Profile updated successfully.",
             "full_name": user.full_name,
             "phone_number": user.phone_number,
         }
@@ -267,7 +267,7 @@ class UserService:
             )
         user.role = "admin"
         user.save()
-        return {"result": f"User {email} has been promoted to admin."}
+        return {"message": f"User {email} has been promoted to admin."}
 
     @staticmethod
     def disable_user(user_id: str):
@@ -322,4 +322,4 @@ class UserService:
             )
         user.house_id = house.id
         user.save()
-        return {"result": f"User {email} has been linked to house {house_id}."}
+        return {"message": f"User {email} has been linked to house {house_id}."}
