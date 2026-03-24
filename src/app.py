@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -7,12 +8,14 @@ from commons.exceptions_handler import register_exception_handlers
 from commons.log_helper import get_logger
 from routers import (
     auth_router,
+    gatehouse_router,
     houses_router,
     passes_router,
     profile_router,
     users_router,
 )
 from services import connect_to_mongodb, disconnect_from_mongodb
+from services.passes_service import update_passes_status
 
 _LOG = get_logger(__name__)
 
@@ -20,7 +23,7 @@ _LOG = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     connect_to_mongodb()
-
+    asyncio.create_task(update_passes_status())
     yield
 
     disconnect_from_mongodb()
@@ -43,6 +46,7 @@ app.include_router(router=users_router)
 app.include_router(router=profile_router)
 app.include_router(router=houses_router)
 app.include_router(router=passes_router)
+app.include_router(router=gatehouse_router)
 
 
 @app.get("/")

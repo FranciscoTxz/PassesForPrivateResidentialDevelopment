@@ -1,7 +1,9 @@
 import jwt
 from fastapi import Header, HTTPException
+from mongoengine import DoesNotExist
 
 from commons.constants import SECRET_KEY
+from models.users import Users
 from schemas.users_schema import UserInfo
 from services.users_service import UserService
 
@@ -52,3 +54,31 @@ def get_current_user_info(validate_owner: bool = False, validate_admin: bool = F
             )
 
     return verify_token
+
+
+def validate_gatehouse_token():
+    def validate_token(authorization: str = Header(None)):
+        try:
+            attributes = jwt.decode(authorization, SECRET_KEY, algorithms=["HS256"])
+            if attributes.get("role") != "gatehouse":
+                raise HTTPException(
+                    status_code=403,
+                    detail="Forbidden: User does not have the required role",
+                )
+            Users.objects.get(email=attributes.get("admin_email"))
+        except DoesNotExist:
+            raise HTTPException(status_code=404, detail="Admin user not found")
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(
+                status_code=401, detail="Unauthorized: Token has expired"
+            )
+        except jwt.InvalidTokenError:
+            raise HTTPException(status_code=401, detail="Unauthorized: Invalid token")
+        except HTTPException:
+            raise
+        except Exception:
+            raise HTTPException(
+                status_code=401, detail="Unauthorized: Missing or invalid token"
+            )
+
+    return validate_token

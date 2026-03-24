@@ -64,6 +64,8 @@ module = [
     "services",
     "services.users_service",
     "services.houses_service",
-    "services.passes_service"
+    "services.passes_service",
+    "services.gatehouse_service",
+    "commons.auth"
 ]
 disable_error_code = ["attr-defined"]

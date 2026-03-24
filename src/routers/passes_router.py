@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from commons.auth import get_current_user_info
 from schemas.passes_schema import (
@@ -55,6 +55,23 @@ def get_pass_qr(
 
 
 # ADMIN ROUTES
+@router.get("/all", status_code=200)
+def get_all_passes(
+    next_cursor: str | None = Query(default=None),
+    limit: int = Query(default=15, ge=1),
+    user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
+):
+    return PassesService.get_all_passes(cursor_id=next_cursor, limit=limit)
+
+
+@router.get("/search", status_code=200)
+def search_pass_by_id(
+    pass_id: str = Query(...),
+    user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
+):
+    return PassesService.search_pass_by_id(pass_id)
+
+
 @router.get("/pending/count", status_code=200)
 def count_pending_passes(
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
