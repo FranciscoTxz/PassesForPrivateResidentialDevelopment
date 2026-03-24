@@ -34,8 +34,8 @@ jobs:
       - name: Check Docker availability
         run: docker info
 
-      # - name: Run smoke tests
-      #   run: uv run pytest tests/smoke
+      - name: Run smoke tests
+        run: uv run pytest tests/smoke
 
       - name: Validate Docker build
         run: docker build -t simple-fastapi-project:ci .
