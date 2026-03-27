@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.135.1",
     "mongoengine>=0.29.3",
+    "openai>=2.29.0",
     "pydantic[email]>=2.12.5",
     "pyjwt>=2.12.1",
     "pypng>=0.20220715.0",
@@ -66,6 +67,11 @@ module = [
     "services.houses_service",
     "services.passes_service",
     "services.gatehouse_service",
-    "commons.auth"
+    "commons.auth",
+    "services.email_service"
 ]
 disable_error_code = ["attr-defined"]
+
+[[tool.mypy.overrides]]
+module = ["services.review_service"]
+ignore_errors = true

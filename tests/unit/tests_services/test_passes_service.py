@@ -150,7 +150,7 @@ class TestGetPassQr:
         mock_passes.objects.get.return_value = pass_obj
         monkeypatch.setattr(passes_service_module, "Passes", mock_passes)
         monkeypatch.setattr(
-            passes_service_module, "generate_qr_base64", lambda pid: "base64data"
+            passes_service_module, "generate_qr", lambda pid: "base64data"
         )
 
         result = PassesService.get_pass_qr("pass-uuid-1", "house123")
@@ -311,6 +311,11 @@ class TestApprovePass:
         mock_passes = MagicMock()
         mock_passes.objects.get.return_value = pass_obj
         monkeypatch.setattr(passes_service_module, "Passes", mock_passes)
+        monkeypatch.setattr(
+            passes_service_module.EmailService,
+            "send_review_email_via_smtp",
+            lambda **kwargs: {},
+        )
 
         result = PassesService.approve_pass("pass-uuid-1")
 
@@ -341,6 +346,69 @@ class TestApprovePass:
         assert exc_info.value.status_code == 404
 
 
+# ─── review_pass_automatically ────────────────────────────────────────────────────────
+class TestReviewPassAutomatically:
+    def test_approves_pending_pass_automatically(self, monkeypatch):
+        result_obj = MagicMock()
+        result_obj.approved = True
+        result_obj.reason = "All required information is provided."
+        pass_obj = make_mock_pass(status="pending", enabled=False)
+        mock_passes = MagicMock()
+        mock_passes.objects.get.return_value = pass_obj
+        monkeypatch.setattr(passes_service_module, "Passes", mock_passes)
+        monkeypatch.setattr(
+            passes_service_module.ReviewService, "review_pass", lambda msg: result_obj
+        )
+        monkeypatch.setattr(
+            passes_service_module.EmailService,
+            "send_review_email_via_smtp",
+            lambda **kwargs: {},
+        )
+
+        result = PassesService.review_pass_automatically("pass-uuid-1")
+
+        assert pass_obj.enabled is True
+        assert pass_obj.status == "approved"
+        pass_obj.save.assert_called_once()
+        assert result.approved is True
+        assert result.reason == "All required information is provided."
+
+    def test_approves_pending_pass_automatically_false(self, monkeypatch):
+        result_obj = MagicMock()
+        result_obj.approved = False
+        result_obj.reason = "Some information is missing."
+        pass_obj = make_mock_pass(status="pending", enabled=False)
+        mock_passes = MagicMock()
+        mock_passes.objects.get.return_value = pass_obj
+        monkeypatch.setattr(passes_service_module, "Passes", mock_passes)
+        monkeypatch.setattr(
+            passes_service_module.ReviewService, "review_pass", lambda msg: result_obj
+        )
+        monkeypatch.setattr(
+            passes_service_module.EmailService,
+            "send_review_email_via_smtp",
+            lambda **kwargs: {},
+        )
+
+        result = PassesService.review_pass_automatically("pass-uuid-1")
+
+        assert pass_obj.enabled is False
+        assert pass_obj.status == "rejected"
+        pass_obj.save.assert_called_once()
+        assert result.approved is False
+        assert result.reason == "Some information is missing."
+
+    def test_not_found_raises_404(self, monkeypatch):
+        mock_passes = MagicMock()
+        mock_passes.objects.get.side_effect = DoesNotExist()
+        monkeypatch.setattr(passes_service_module, "Passes", mock_passes)
+
+        with pytest.raises(HTTPException) as exc_info:
+            PassesService.review_pass_automatically("nonexistent")
+
+        assert exc_info.value.status_code == 404
+
+
 # ─── reject_pass ──────────────────────────────────────────────────────────────
 
 
@@ -350,8 +418,15 @@ class TestRejectPass:
         mock_passes = MagicMock()
         mock_passes.objects.get.return_value = pass_obj
         monkeypatch.setattr(passes_service_module, "Passes", mock_passes)
+        monkeypatch.setattr(
+            passes_service_module.EmailService,
+            "send_review_email_via_smtp",
+            lambda **kwargs: {},
+        )
 
-        result = PassesService.reject_pass("pass-uuid-1")
+        result = PassesService.reject_pass(
+            "pass-uuid-1", "The information provided is not sufficient for approval."
+        )
 
         assert pass_obj.enabled is False
         assert pass_obj.status == "rejected"
@@ -364,7 +439,10 @@ class TestRejectPass:
         monkeypatch.setattr(passes_service_module, "Passes", mock_passes)
 
         with pytest.raises(HTTPException) as exc_info:
-            PassesService.reject_pass("nonexistent")
+            PassesService.reject_pass(
+                "nonexistent",
+                "The information provided is not sufficient for approval.",
+            )
 
         assert exc_info.value.status_code == 404
 

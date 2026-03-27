@@ -29,7 +29,7 @@ class CreatePassesForDays(BaseModel):
     days: int = Field(gt=0, lt=8)
     guest_name: str = Field(min_length=3, max_length=100)
     valid_from: datetime
-    reason: str = Field(min_length=10, max_length=200)
+    reason: str = Field(min_length=10, max_length=300)
 
     @field_validator("valid_from")
     def validate_valid_from(cls, value):
@@ -52,3 +52,8 @@ class PassesResponseUser(BaseModel):
 
 class PassesResponseList(BaseModel):
     passes: list[PassesResponseUser]
+
+
+class ReviewSchema(BaseModel):
+    approved: bool
+    reason: str = Field(min_length=10, max_length=300)

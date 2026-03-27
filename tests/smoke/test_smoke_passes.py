@@ -302,7 +302,7 @@ def test_approve_pass_success(admin_client, user_client, dynamo_client):
     )
     pass_id = create.json()["pass_id"]
 
-    response = admin_client.post(f"/passes/{pass_id}/approve")
+    response = admin_client.patch(f"/passes/{pass_id}/approve")
     assert response.status_code == 200
     assert response.json()["message"] == "Pass approved successfully"
 
@@ -318,13 +318,13 @@ def test_approve_pass_not_pending_raises_400(admin_client, user_client, dynamo_c
     )
     pass_id = create.json()["pass"]["_id"]
 
-    response = admin_client.post(f"/passes/{pass_id}/approve")
+    response = admin_client.patch(f"/passes/{pass_id}/approve")
     assert response.status_code == 400
     assert "Only pending" in response.json()["message"]
 
 
 def test_approve_pass_not_found(admin_client, dynamo_client):
-    response = admin_client.post("/passes/nonexistent-id/approve")
+    response = admin_client.patch("/passes/nonexistent-id/approve")
     assert response.status_code == 404
 
 
@@ -343,11 +343,15 @@ def test_reject_pass_success(admin_client, user_client, dynamo_client):
     )
     pass_id = create.json()["pass_id"]
 
-    response = admin_client.delete(f"/passes/{pass_id}/reject")
+    response = admin_client.delete(
+        f"/passes/{pass_id}/reject", params={"reason": "Does not meet criteria"}
+    )
     assert response.status_code == 200
     assert response.json()["message"] == "Pass rejected successfully"
 
 
 def test_reject_pass_not_found(admin_client, dynamo_client):
-    response = admin_client.delete("/passes/nonexistent-id/reject")
+    response = admin_client.delete(
+        "/passes/nonexistent-id/reject", params={"reason": "Does not meet criteria"}
+    )
     assert response.status_code == 404

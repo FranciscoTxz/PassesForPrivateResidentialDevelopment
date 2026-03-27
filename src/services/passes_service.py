@@ -6,7 +6,9 @@ from mongoengine import DoesNotExist, Q
 
 from commons.log_helper import get_logger
 from models.passes import Passes
-from services.qr_generator_service import generate_qr_base64
+from services.email_service import EmailService
+from services.qr_generator_service import generate_qr
+from services.review_service import ReviewService
 
 _LOG = get_logger(__name__)
 
@@ -34,7 +36,7 @@ class PassesService:
     ):
         valid_until = valid_from + timedelta(days=days)
         new_pass = Passes(
-            pass_type="visit",
+            pass_type="visit for days",
             enabled=False,
             status="pending",
             guest_name=guest_name,
@@ -65,7 +67,7 @@ class PassesService:
             raise HTTPException(status_code=404, detail="Pass not found")
         if not pass_obj.enabled:
             raise HTTPException(status_code=400, detail="Pass is not enabled")
-        qr_code = generate_qr_base64(pass_obj.id)
+        qr_code = generate_qr(pass_obj.id)
         return {"qr_jpg_code_base64": qr_code}
 
     @staticmethod
@@ -109,6 +111,35 @@ class PassesService:
         return [pass_obj.to_mongo() for pass_obj in passes]
 
     @staticmethod
+    def review_pass_automatically(pass_id: str):
+        try:
+            pass_obj: Passes = Passes.objects.get(id=pass_id, status="pending")
+        except DoesNotExist:
+            raise HTTPException(status_code=404, detail="No pending pass found")
+        reason = f"From: {pass_obj.valid_from} To: {pass_obj.valid_until}. House ID: {pass_obj.house_id}. Guest Name: {pass_obj.guest_name}. Reason: {pass_obj.reason}"
+        result = ReviewService.review_pass(reason)
+        if result.approved is True:
+            pass_obj.enabled = True
+            pass_obj.status = "approved"
+        else:
+            pass_obj.enabled = False
+            pass_obj.status = "rejected"
+        pass_obj.save()
+
+        date_range = f"{pass_obj.valid_from.strftime('%Y-%m-%d %H:%M')} to {pass_obj.valid_until.strftime('%Y-%m-%d %H:%M')}"
+
+        EmailService.send_review_email_via_smtp(
+            pass_id=pass_obj.id,
+            target_house=pass_obj.house_id,
+            guest_name=pass_obj.guest_name,
+            date_range=date_range,
+            approved=result.approved,
+            reason=result.reason,
+        )
+
+        return result
+
+    @staticmethod
     def approve_pass(pass_id: str):
         try:
             pass_obj = Passes.objects.get(id=pass_id)
@@ -121,10 +152,22 @@ class PassesService:
         pass_obj.enabled = True
         pass_obj.status = "approved"
         pass_obj.save()
+
+        date_range = f"{pass_obj.valid_from.strftime('%Y-%m-%d %H:%M')} to {pass_obj.valid_until.strftime('%Y-%m-%d %H:%M')}"
+
+        EmailService.send_review_email_via_smtp(
+            pass_id=pass_obj.id,
+            target_house=pass_obj.house_id,
+            guest_name=pass_obj.guest_name,
+            date_range=date_range,
+            approved=True,
+            reason="Pass approved.",
+        )
+
         return {"message": "Pass approved successfully"}
 
     @staticmethod
-    def reject_pass(pass_id: str):
+    def reject_pass(pass_id: str, reason: str):
         try:
             pass_obj = Passes.objects.get(id=pass_id)
         except DoesNotExist:
@@ -132,6 +175,18 @@ class PassesService:
         pass_obj.enabled = False
         pass_obj.status = "rejected"
         pass_obj.save()
+
+        date_range = f"{pass_obj.valid_from.strftime('%Y-%m-%d %H:%M')} to {pass_obj.valid_until.strftime('%Y-%m-%d %H:%M')}"
+
+        EmailService.send_review_email_via_smtp(
+            pass_id=pass_obj.id,
+            target_house=pass_obj.house_id,
+            guest_name=pass_obj.guest_name,
+            date_range=date_range,
+            approved=False,
+            reason=reason,
+        )
+
         return {"message": "Pass rejected successfully"}
 
 
