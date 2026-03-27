@@ -12,6 +12,14 @@ Add `.env` file with the following content:
 ```yaml
 SECRET_KEY=change-me
 MONGODB_URI=mongodb://admin:admin123@localhost:27017/?authSource=admin
+
+# TO USE AI
+OPENAI_API_ENDPOINT=your-openai-endpoint
+OPENAI_API_KEY=your-openai-api-key
+
+# TO USE EMAIL
+SENDER_EMAIL=youemail@hot.com
+SENDER_PASSWORD=your-email-password-for-smtp
 ```
 Add this code to `commons/constants.py`:
 ```python
@@ -34,6 +42,14 @@ Add `.env` file with the following content:
 ```yaml
 SECRET_KEY=change-me
 MONGODB_URI=mongodb://admin:admin123@mongodb:27017/?authSource=admin
+
+# TO USE AI
+OPENAI_API_ENDPOINT=your-openai-endpoint
+OPENAI_API_KEY=your-openai-api-key
+
+# TO USE EMAIL
+SENDER_EMAIL=youemail@hot.com
+SENDER_PASSWORD=your-email-password-for-smtp
 ```
 Run docker compose
 ```bash

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Pass Review Result - {house_id}</title>
+    <style>
+        @media only screen and (max-width: 600px) {{
+            .email-container {{
+                width: 100% !important;
+                padding: 10px !important;
+            }}
+            .header {{
+                font-size: 24px !important;
+                padding: 20px 10px !important;
+            }}
+            .content {{
+                padding: 20px 15px !important;
+            }}
+        }}
+    </style>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f7f9;">
+        <tr>
+            <td align="center" style="padding: 40px 10px;">
+                <!-- Main Container -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="email-container" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden;">
+
+                    <!-- Header -->
+                    <tr>
+                        <td class="header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 20px; text-align: center;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600; letter-spacing: -0.5px;">Pass Review Result</h1>
+                        </td>
+                    </tr>
+
+                    <!-- House ID Banner -->
+                    <tr>
+                        <td style="padding: 0;">
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td style="background-color: #f8f9fa; padding: 20px 30px; border-bottom: 3px solid #667eea;">
+                                        <h2 style="margin: 0; color: #2d3748; font-size: 20px; font-weight: 600;">
+                                            <span style="color: #667eea;">🏠</span> {house_id}
+                                        </h2>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Main Content -->
+                    <tr>
+                        <td class="content" style="padding: 30px 40px;">
+                            <p style="margin: 0 0 20px; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                                Dear {user_name},
+                            </p>
+
+                            <p style="margin: 0 0 20px; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                                After reviewing your request for a pass for user <strong>{guest_name}</strong>, we are pleased to inform you that your pass has been:
+                            </p>
+
+                            <!-- Date Range Box -->
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 25px 0;">
+                                <tr>
+                                    <td style="background-color: #edf2f7; border-left: 4px solid #667eea; border-radius: 4px; padding: 20px;">
+                                        <p style="margin: 0 0 8px; color: #21252a; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                            {approved}
+                                        </p>
+                                        <p style="margin: 0; color: #2d3748; font-size: 14px; font-weight: 600;">
+                                            🗝️ {pass_id}
+                                        </p>
+                                        <p style="margin: 0; color: #2d3748; font-size: 14px; font-weight: 400;">
+                                            📅 {date_range}
+                                        </p>
+                                        <p style="margin: 0; color: #2d3748; font-size: 14px; font-weight: 400;">
+                                            📝 reason: {reason}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            {qr_code}
+
+                            <p style="margin: 20px 0 0; color: #4a5568; font-size: 14px; line-height: 1.6;">If your pass is rejected, please resubmit your application taking into account the recommendations and reasons for the rejection. </p>
+
+                            <p style="margin: 25px 0 0; color: #4a5568; font-size: 14px; line-height: 1.6;">
+                                If you have any questions or require additional information, please don't hesitate to contact our support team.
+                            </p>
+
+                            <p style="margin: 20px 0 0; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                                Best regards,<br>
+                                <strong style="color: #2d3748;">Pass Management System</strong>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #2d3748; padding: 25px 30px; text-align: center; border-top: 3px solid #667eea;">
+                            <p style="margin: 0 0 10px; color: #cbd5e0; font-size: 13px; line-height: 1.5;">
+                                This is an automated report generated by the Pass Management System
+                            </p>
+                            <p style="margin: 0; color: #a0aec0; font-size: 12px;">
+                                © 2026 Pass Management System. All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

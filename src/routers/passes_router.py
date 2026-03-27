@@ -86,7 +86,7 @@ def get_pending_passes(
     return PassesService.get_pending_passes()
 
 
-@router.post("/{pass_id}/approve", status_code=200)
+@router.patch("/{pass_id}/approve", status_code=200)
 def approve_pass(
     pass_id: str,
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
@@ -97,6 +97,15 @@ def approve_pass(
 @router.delete("/{pass_id}/reject", status_code=200)
 def reject_pass(
     pass_id: str,
+    reason: str = Query(...),
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
 ):
-    return PassesService.reject_pass(pass_id)
+    return PassesService.reject_pass(pass_id, reason)
+
+
+@router.patch("/{pass_id}/auto-review", status_code=200)
+def auto_review_pass(
+    pass_id: str,
+    user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
+):
+    return PassesService.review_pass_automatically(pass_id)
