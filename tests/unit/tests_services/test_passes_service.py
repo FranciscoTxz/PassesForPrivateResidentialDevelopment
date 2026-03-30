@@ -42,6 +42,11 @@ class TestCreateSimplePass:
         mock_passes = MagicMock()
         mock_passes.return_value = new_pass
         monkeypatch.setattr(passes_service_module, "Passes", mock_passes)
+        monkeypatch.setattr(
+            passes_service_module.EmailService,
+            "send_review_email_via_smtp",
+            lambda **kwargs: {},
+        )
 
         valid_from = datetime(2026, 3, 24, 10, 0)
         result = PassesService.create_simple_pass(
@@ -59,6 +64,11 @@ class TestCreateSimplePass:
         mock_passes = MagicMock()
         mock_passes.return_value = make_mock_pass()
         monkeypatch.setattr(passes_service_module, "Passes", mock_passes)
+        monkeypatch.setattr(
+            passes_service_module.EmailService,
+            "send_review_email_via_smtp",
+            lambda **kwargs: {},
+        )
 
         valid_from = datetime(2026, 3, 24, 10, 0)
         PassesService.create_simple_pass(
@@ -72,6 +82,11 @@ class TestCreateSimplePass:
         mock_passes = MagicMock()
         mock_passes.return_value = make_mock_pass()
         monkeypatch.setattr(passes_service_module, "Passes", mock_passes)
+        monkeypatch.setattr(
+            passes_service_module.EmailService,
+            "send_review_email_via_smtp",
+            lambda **kwargs: {},
+        )
 
         valid_from = datetime(2026, 3, 24, 10, 0)
         PassesService.create_simple_pass("unknown_type", "Jane", valid_from, "house123")

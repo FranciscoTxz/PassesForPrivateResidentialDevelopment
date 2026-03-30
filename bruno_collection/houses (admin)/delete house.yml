@@ -1,0 +1,18 @@
+info:
+  name: delete house
+  type: http
+  seq: 5
+
+http:
+  method: DELETE
+  url: "{{URL}}/houses/{{ID_HOUSE}}"
+  headers:
+    - name: Authorization
+      value: "{{TOKEN_ADMIN}}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

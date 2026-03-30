@@ -1,0 +1,26 @@
+info:
+  name: update profile
+  type: http
+  seq: 2
+
+http:
+  method: PATCH
+  url: "{{URL}}/profile"
+  headers:
+    - name: Authorization
+      value: "{{TOKEN}}"
+  body:
+    type: json
+    data: |-
+      {
+        "first_name": "Javier Antonio",
+        "last_name": "Perez Martinez",
+        "phone_number": "+524492013599"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

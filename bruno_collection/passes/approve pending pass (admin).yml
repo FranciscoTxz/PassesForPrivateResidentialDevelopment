@@ -1,0 +1,17 @@
+info:
+  name: approve pending pass (admin)
+  type: http
+  seq: 9
+
+http:
+  method: PATCH
+  url: "{{URL}}/passes/{{PASS_ID}}/approve"
+  headers:
+    - name: Authorization
+      value: "{{TOKEN_ADMIN}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

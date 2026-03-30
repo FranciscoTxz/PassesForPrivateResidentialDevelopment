@@ -1,0 +1,31 @@
+info:
+  name: get users
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{URL}}/users"
+  headers:
+    - name: Authorization
+      value: "{{TOKEN_ADMIN}}"
+  params:
+    - name: query
+      value: user_1@hotx.com
+      type: query
+      disabled: true
+    - name: page_size
+      value: "2"
+      type: query
+      disabled: true
+    - name: page
+      value: "4"
+      type: query
+      disabled: true
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

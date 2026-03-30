@@ -1,0 +1,17 @@
+info:
+  name: get pass qr
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{URL}}/passes/{{PASS_ID}}/qr"
+  headers:
+    - name: Authorization
+      value: "{{TOKEN}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

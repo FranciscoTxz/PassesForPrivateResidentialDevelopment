@@ -1,0 +1,17 @@
+info:
+  name: auto approve pending pass (admin)
+  type: http
+  seq: 11
+
+http:
+  method: PATCH
+  url: "{{URL}}/passes/{{PASS_ID}}/auto-review"
+  headers:
+    - name: Authorization
+      value: "{{TOKEN_ADMIN}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

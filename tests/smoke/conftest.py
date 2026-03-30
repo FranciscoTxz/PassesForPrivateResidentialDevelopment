@@ -14,6 +14,7 @@ from testcontainers.core.container import DockerContainer
 from models.houses import Houses
 from models.passes import Passes
 from models.users import Users
+from services.email_service import EmailService
 
 TABLES = [Passes]
 FIXED_TABLES = [Users, Houses]
@@ -153,6 +154,15 @@ def dynamo_client(create_fixed_tables):
 
     for model in TABLES:
         model.drop_collection()
+
+
+@pytest.fixture(scope="function", autouse=True)
+def patch_external_clients(monkeypatch):
+    monkeypatch.setattr(
+        EmailService,
+        "send_review_email_via_smtp",
+        lambda **kwargs: {},
+    )
 
 
 @pytest.fixture(scope="function")
