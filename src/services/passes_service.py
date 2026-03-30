@@ -28,6 +28,18 @@ class PassesService:
             house_id=house_id,
         )
         new_pass.save()
+        new_pass.reload()
+
+        date_range = f"{new_pass.valid_from.strftime('%Y-%m-%d %H:%M')} to {new_pass.valid_until.strftime('%Y-%m-%d %H:%M')}"
+
+        EmailService.send_review_email_via_smtp(
+            pass_id=new_pass.id,
+            target_house=new_pass.house_id,
+            guest_name=new_pass.guest_name,
+            date_range=date_range,
+            approved=True,
+            reason="Automatically approved",
+        )
         return {"message": "Pass created successfully", "pass": new_pass.to_mongo()}
 
     @staticmethod

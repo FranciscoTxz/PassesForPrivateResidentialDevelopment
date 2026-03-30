@@ -1,0 +1,17 @@
+info:
+  name: get pending passes (admin)
+  type: http
+  seq: 8
+
+http:
+  method: GET
+  url: "{{URL}}/passes/pending"
+  headers:
+    - name: Authorization
+      value: "{{TOKEN_ADMIN}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

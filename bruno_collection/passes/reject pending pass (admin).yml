@@ -1,0 +1,21 @@
+info:
+  name: reject pending pass (admin)
+  type: http
+  seq: 10
+
+http:
+  method: DELETE
+  url: "{{URL}}/passes/{{PASS_ID}}/reject?reason=Insufficient information to make a decision."
+  headers:
+    - name: Authorization
+      value: "{{TOKEN_ADMIN}}"
+  params:
+    - name: reason
+      value: Insufficient information to make a decision.
+      type: query
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,22 @@
+info:
+  name: enable user
+  type: http
+  seq: 6
+
+http:
+  method: PATCH
+  url: "{{URL}}/users/enable?email=user_1@hotx.coma"
+  headers:
+    - name: Authorization
+      value: "{{TOKEN_ADMIN}}"
+  params:
+    - name: email
+      value: user_1@hotx.coma
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

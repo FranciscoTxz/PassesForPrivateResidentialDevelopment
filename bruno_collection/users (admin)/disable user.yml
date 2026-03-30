@@ -1,0 +1,22 @@
+info:
+  name: disable user
+  type: http
+  seq: 5
+
+http:
+  method: PATCH
+  url: "{{URL}}/users/disable?email=user_1@hotx.coma"
+  headers:
+    - name: Authorization
+      value: "{{TOKEN_ADMIN}}"
+  params:
+    - name: email
+      value: user_1@hotx.coma
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
