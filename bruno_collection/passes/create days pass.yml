@@ -1,0 +1,33 @@
+info:
+  name: create days pass
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{URL}}/passes/days"
+  headers:
+    - name: Authorization
+      value: "{{TOKEN}}"
+  body:
+    type: json
+    data: |-
+      {
+        "days": 5,
+        "guest_name": "Angel Torres V",
+        "valid_from": "2026-03-31T13:00:00.000-06:00",
+        "reason": "My friend is coming to visit me."
+      }
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        var jsonData = res.getBody();
+        bru.setEnvVar("PASS_ID", jsonData.pass_id);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

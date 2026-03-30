@@ -1,0 +1,25 @@
+info:
+  name: link user to house
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: "{{URL}}/users/link?email=samaelxz@outlook.com&house_id=SV101"
+  headers:
+    - name: Authorization
+      value: "{{TOKEN_ADMIN}}"
+  params:
+    - name: email
+      value: samaelxz@outlook.com
+      type: query
+    - name: house_id
+      value: SV101
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

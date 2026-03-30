@@ -1,0 +1,39 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb_passes_for_private_residential_development
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_passes_for_private_residential_development_data:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'mongosh --eval ''db.adminCommand("ping")'' || mongo --eval ''db.adminCommand("ping")'' || exit 1',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  api_handler:
+    container_name: passes_for_private_residential_development_api_handler
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+volumes:
+  mongodb_passes_for_private_residential_development_data:

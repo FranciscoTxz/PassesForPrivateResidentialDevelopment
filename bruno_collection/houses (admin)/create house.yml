@@ -1,0 +1,34 @@
+info:
+  name: create house
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{URL}}/houses"
+  headers:
+    - name: Authorization
+      value: "{{TOKEN_ADMIN}}"
+  body:
+    type: json
+    data: |-
+      {
+        "id": "SV404",
+        "number": 404,
+        "street": "Av. Siempre Viva",
+        "extra": "Fracc. El Paraíso, Guadalajara, Jalisco"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        var jsonData = res.getBody();
+        bru.setEnvVar("ID_HOUSE", jsonData._id);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

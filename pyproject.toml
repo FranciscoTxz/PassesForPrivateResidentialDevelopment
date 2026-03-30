@@ -1,0 +1,77 @@
+[project]
+name = "passesforprivateresidentialdevelopment"
+version = "0.1.0"
+description = "A Python package for managing passes for private residential development."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.135.1",
+    "mongoengine>=0.29.3",
+    "openai>=2.29.0",
+    "pydantic[email]>=2.12.5",
+    "pyjwt>=2.12.1",
+    "pypng>=0.20220715.0",
+    "qrcode[pil]>=8.2",
+    "types-qrcode>=8.2.0.20250914",
+    "uvicorn>=0.42.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pre-commit>=4.5.1",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "pytest-env>=1.5.0",
+    "python-dotenv>=1.2.2",
+    "ruff>=0.15.5",
+    "testcontainers>=4.14.1",
+    "mypy>=1.19.1",
+]
+
+[tool.ruff]
+exclude      = ["*venv*", "build", "dist"] # Basic patterns for exclusion
+indent-width = 4                           # Like Black, set the default line width indentation to 4
+line-length  = 88                          # Like Black, set the default max line lenght to 88
+
+[tool.ruff.lint]
+ignore = ["E501"]
+# E: pycodestyle
+# F: Pyflakes
+# I: isort
+# UP: pyupgrade
+select = ["E", "F", "I", "UP"]
+
+[tool.ruff.format]
+indent-style              = "space"  # Like Black, indent with spaces rather than tabs
+line-ending               = "auto"   # Automatically detect the appropriate line ending.
+quote-style               = "double" # Like Black, use double quotes for strings.
+skip-magic-trailing-comma = false    # Like Black, respect magic trailing commas.
+
+[tool.ty.environment]
+extra-paths = ["src"]
+
+[tool.mypy]
+mypy_path = "src"
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = ["mongoengine", "mongoengine.*"]
+ignore_missing_imports = true
+follow_untyped_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "services",
+    "services.users_service",
+    "services.houses_service",
+    "services.passes_service",
+    "services.gatehouse_service",
+    "commons.auth",
+    "services.email_service"
+]
+disable_error_code = ["attr-defined"]
+
+[[tool.mypy.overrides]]
+module = ["services.review_service"]
+ignore_errors = true

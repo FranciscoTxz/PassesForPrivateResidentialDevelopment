@@ -1,0 +1,26 @@
+info:
+  name: get all passes (admin)
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: "{{URL}}/passes/all"
+  headers:
+    - name: Authorization
+      value: "{{TOKEN_ADMIN}}"
+  params:
+    - name: next_cursor
+      value: b898c60b-8907-448a-802c-b6e54d4d954c
+      type: query
+      disabled: true
+    - name: limit
+      value: "2"
+      type: query
+      disabled: true
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

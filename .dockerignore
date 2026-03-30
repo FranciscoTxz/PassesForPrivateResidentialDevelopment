@@ -1,0 +1,72 @@
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist/
+build/
+
+# Testing
+tests/
+.pytest_cache/
+.coverage
+.coveragerc
+htmlcov/
+*.coverage.*
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD and deployment
+deploy-templates/
+.pre-commit-config.yaml
+sonar-project.properties
+
+# Documentation
+README.md
+LICENSE
+*.md
+
+# Development files
+requirements.txt
+test-requirements.txt
+setup.py
+.python-version
+version/
+
+# Environment files
+.env
+.env.*
+
+# Linters and formatters
+.ruff_cache/
+.mypy_cache/
+.pylint.d/
+
+# Scripts
+*.ps1
+*.sh
+
+# Misc
+*.log
+.cache/

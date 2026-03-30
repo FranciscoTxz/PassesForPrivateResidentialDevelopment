@@ -1,0 +1,17 @@
+info:
+  name: validate_pass
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{URL}}/gatehouse/validate_pass/{{PASS_ID}}"
+  headers:
+    - name: Authorization
+      value: "{{GATEHOUSE_TOKEN}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

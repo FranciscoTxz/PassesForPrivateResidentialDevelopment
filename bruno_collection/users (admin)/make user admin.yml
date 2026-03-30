@@ -1,0 +1,22 @@
+info:
+  name: make user admin
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: "{{URL}}/users?email=samaelxz@outlook.com"
+  headers:
+    - name: Authorization
+      value: "{{TOKEN_ADMIN}}"
+  params:
+    - name: email
+      value: samaelxz@outlook.com
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
