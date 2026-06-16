@@ -6,8 +6,8 @@ from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.requests import Request
 
-from commons.exceptions_handler import register_exception_handlers
 from commons import exceptions_handler as exception_module
+from commons.exceptions_handler import register_exception_handlers
 
 
 def _build_request(path: str = "/test") -> Request:

@@ -29,6 +29,23 @@ def make_mock_user(**overrides):
     return user
 
 
+def make_mock_user_with_house(**overrides):
+    user = MagicMock()
+    user.email = "user2@example.com"
+    user.first_name = "Jean"
+    user.last_name = "Paul"
+    user.full_name = "Jean Paul"
+    user.birthdate = "1999-10-11"
+    user.phone_number = "+12345678901"
+    user.password_hash = sha1(b"Password1!user@example.com").hexdigest()
+    user.enabled = True
+    user.house_id = "SV101"
+    user.role = "user"
+    for k, v in overrides.items():
+        setattr(user, k, v)
+    return user
+
+
 def make_mock_house(**overrides):
     house = MagicMock()
     house.id = "house123"
@@ -585,3 +602,32 @@ class TestGetUserInfoByEmailName:
         assert result["has_next"] is True
         assert result["next_page"] == 2
         assert len(result["users"]) == 2
+
+
+# ─── get_user_info_by_email_name ──────────────────────────────────────────────
+
+
+class TestGetUserByHouseId:
+    @staticmethod
+    def test_get_user_by_house_id(monkeypatch):
+        user = make_mock_user_with_house()
+        user.to_mongo.return_value = {"house_id": "SV101"}
+        mock_users = MagicMock()
+        mock_users.objects.get.return_value = user
+        monkeypatch.setattr(users_service_module, "Users", mock_users)
+
+        result = UserService.get_user_by_house_id("SV101")
+
+        assert len(result) == 1
+        assert result["user"]["email"] == "user2@example.com"
+
+    @staticmethod
+    def test_no_results_raises_404(monkeypatch):
+        mock_users = MagicMock()
+        mock_users.objects.get.side_effect = DoesNotExist()
+        monkeypatch.setattr(users_service_module, "Users", mock_users)
+
+        with pytest.raises(HTTPException) as exc_info:
+            UserService.get_user_by_house_id("AAA")
+
+        assert exc_info.value.status_code == 404

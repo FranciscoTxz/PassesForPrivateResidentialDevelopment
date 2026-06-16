@@ -29,7 +29,7 @@ load_dotenv()
 ```
 Run MongoDB database using Docker
 ```bash
-compose -f 'docker-compose.yml' up -d --build 'mongodb'
+docker compose -f 'docker-compose.yml' up -d --build 'mongodb'
 ```
 Run the API
 ```bash

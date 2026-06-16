@@ -22,6 +22,14 @@ def get_users(
     )
 
 
+@router.get("/house", status_code=200)
+def get_user_by_house_id(
+    house_id: str = Query(),
+    user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
+):
+    return UserService.get_user_by_house_id(house_id)
+
+
 @router.get("/pages", status_code=200)
 def get_users_pages(
     query: str | None = Query(default=None),

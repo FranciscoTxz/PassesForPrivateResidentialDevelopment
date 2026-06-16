@@ -12,8 +12,7 @@ def get_current_user_info(validate_owner: bool = False, validate_admin: bool = F
     def verify_token(authorization: str = Header(None)) -> UserInfo:
         try:
             attributes = jwt.decode(authorization, SECRET_KEY, algorithms=["HS256"])
-            email = attributes.get("email")
-
+            email = attributes.get("email", None)
             if not email:
                 raise HTTPException(
                     status_code=401, detail="Unauthorized: Missing or invalid token"
