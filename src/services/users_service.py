@@ -258,6 +258,16 @@ class UserService:
         }
 
     @staticmethod
+    def get_user_by_house_id(house_id: str):
+        try:
+            user = Users.objects.get(house_id=house_id)
+        except DoesNotExist:
+            raise HTTPException(
+                status_code=404, detail=f"User for {house_id} house not found"
+            )
+        return {"user": UserService._serialize_user_info(user)}
+
+    @staticmethod
     def make_user_admin(email: str):
         try:
             user = Users.objects.get(email=email)

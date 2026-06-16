@@ -93,6 +93,19 @@ def test_get_users_query_email_success(admin_client):
     assert len(data["users"]) >= 1
 
 
+def test_get_user_by_house(admin_client):
+    response = admin_client.get("/users/house", params={"house_id": "SV101"})
+    assert response.status_code == 200
+    data = response.json()
+    assert "user" in data
+    assert data["user"]["email"] == "user_1@hot.com"
+
+
+def test_get_user_by_house_404(admin_client):
+    response = admin_client.get("/users/house", params={"house_id": "SV405"})
+    assert response.status_code == 404
+
+
 def test_get_make_user_admin_success(admin_client, user_temp_signup_login):
     _, email, _ = user_temp_signup_login
     response = admin_client.patch("/users", params={"email": email})
