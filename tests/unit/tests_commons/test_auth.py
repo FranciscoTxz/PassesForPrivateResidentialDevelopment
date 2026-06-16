@@ -25,7 +25,7 @@ def make_user_info(**overrides) -> UserInfo:
         "role": "owner",
     }
     data.update(overrides)
-    return UserInfo(**data)  # ty:ignore
+    return UserInfo(**data)
 
 
 # ─── get_current_user_info ───────────────────────────────────────────────────
@@ -37,10 +37,12 @@ class TestGetCurrentUserInfo:
         monkeypatch.setattr(
             auth_module.UserService, "get_user_info", lambda email: user
         )
+
         token = make_token({"email": "user@example.com"})
 
         result = auth_module.get_current_user_info()(authorization=token)
 
+        assert isinstance(result, UserInfo)
         assert result == user
 
     def test_disabled_user_raises_403(self, monkeypatch):
