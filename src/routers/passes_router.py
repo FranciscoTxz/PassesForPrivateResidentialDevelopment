@@ -4,15 +4,22 @@ from commons.auth import get_current_user_info
 from schemas.passes_schema import (
     CreatePassesForDays,
     CreatePassesSimple,
+    PassCreatedForDaysResponse,
+    PassCreatedResponse,
+    PassesPageResponse,
     PassesResponseList,
+    PassesResponseUser,
+    PassQRCodeResponse,
+    PendingPassesCountResponse,
+    ReviewSchema,
 )
-from schemas.users_schema import UserInfo
+from schemas.users_schema import MessageResponse, UserInfo
 from services.passes_service import PassesService
 
 router = APIRouter(prefix="/passes", tags=["Passes"])
 
 
-@router.post("", status_code=201)
+@router.post("", status_code=201, response_model=PassCreatedResponse)
 def create_simple_pass(
     payload: CreatePassesSimple,
     user_info: UserInfo = Depends(get_current_user_info(validate_owner=True)),
@@ -25,7 +32,7 @@ def create_simple_pass(
     )
 
 
-@router.post("/days", status_code=201)
+@router.post("/days", status_code=201, response_model=PassCreatedForDaysResponse)
 def create_pass_for_days(
     payload: CreatePassesForDays,
     user_info: UserInfo = Depends(get_current_user_info(validate_owner=True)),
@@ -46,7 +53,7 @@ def get_passes_for_user(
     return PassesService.get_passes_for_user(user_info.house_id or "")
 
 
-@router.get("/{pass_id}/qr", status_code=200)
+@router.get("/{pass_id}/qr", status_code=200, response_model=PassQRCodeResponse)
 def get_pass_qr(
     pass_id: str,
     user_info: UserInfo = Depends(get_current_user_info(validate_owner=True)),
@@ -55,7 +62,7 @@ def get_pass_qr(
 
 
 # ADMIN ROUTES
-@router.get("/all", status_code=200)
+@router.get("/all", status_code=200, response_model=PassesPageResponse)
 def get_all_passes(
     next_cursor: str | None = Query(default=None),
     limit: int = Query(default=15, ge=1),
@@ -64,7 +71,7 @@ def get_all_passes(
     return PassesService.get_all_passes(cursor_id=next_cursor, limit=limit)
 
 
-@router.get("/search", status_code=200)
+@router.get("/search", status_code=200, response_model=dict)
 def search_pass_by_id(
     pass_id: str = Query(...),
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
@@ -72,21 +79,23 @@ def search_pass_by_id(
     return PassesService.search_pass_by_id(pass_id)
 
 
-@router.get("/pending/count", status_code=200)
+@router.get(
+    "/pending/count", status_code=200, response_model=PendingPassesCountResponse
+)
 def count_pending_passes(
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
 ):
     return PassesService.count_pending_passes()
 
 
-@router.get("/pending", status_code=200)
+@router.get("/pending", status_code=200, response_model=list[PassesResponseUser])
 def get_pending_passes(
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
 ):
     return PassesService.get_pending_passes()
 
 
-@router.patch("/{pass_id}/approve", status_code=200)
+@router.patch("/{pass_id}/approve", status_code=200, response_model=MessageResponse)
 def approve_pass(
     pass_id: str,
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
@@ -94,7 +103,7 @@ def approve_pass(
     return PassesService.approve_pass(pass_id)
 
 
-@router.delete("/{pass_id}/reject", status_code=200)
+@router.delete("/{pass_id}/reject", status_code=200, response_model=MessageResponse)
 def reject_pass(
     pass_id: str,
     reason: str = Query(...),
@@ -103,7 +112,7 @@ def reject_pass(
     return PassesService.reject_pass(pass_id, reason)
 
 
-@router.patch("/{pass_id}/auto-review", status_code=200)
+@router.patch("/{pass_id}/auto-review", status_code=200, response_model=ReviewSchema)
 def auto_review_pass(
     pass_id: str,
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),

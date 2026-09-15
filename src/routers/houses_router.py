@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, Query
 
 from commons.auth import get_current_user_info
-from schemas.houses_schema import CreateHouse
+from schemas.houses_schema import CreateHouse, HouseListResponse, HouseRecord
 from schemas.users_schema import UserInfo
 from services.houses_service import HouseService
 
 router = APIRouter(prefix="/houses", tags=["Houses"])
 
 
-@router.get("", status_code=200)
+@router.get("", status_code=200, response_model=HouseListResponse)
 def get_all_houses(
     next_cursor: str | None = Query(default=None),
     limit: int = Query(default=15, ge=1),
@@ -23,7 +23,7 @@ def get_all_houses(
         return HouseService.get_all_houses(cursor_id=next_cursor, limit=limit)
 
 
-@router.get("/{house_id}", status_code=200)
+@router.get("/{house_id}", status_code=200, response_model=HouseRecord)
 def get_house(
     house_id: str,
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
@@ -31,7 +31,7 @@ def get_house(
     return HouseService.get_house_by_id(house_id=house_id)
 
 
-@router.post("", status_code=201)
+@router.post("", status_code=201, response_model=HouseRecord)
 def create_house(
     house_data: CreateHouse,
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
