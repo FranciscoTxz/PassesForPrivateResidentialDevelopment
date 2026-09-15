@@ -5,7 +5,14 @@ from schemas.houses_schema import CreateHouse, HouseListResponse, HouseRecord
 from schemas.users_schema import UserInfo
 from services.houses_service import HouseService
 
-router = APIRouter(prefix="/houses", tags=["Houses"])
+router = APIRouter(
+    prefix="/houses",
+    tags=["Houses"],
+    responses={
+        401: {"description": "Missing or invalid authentication token"},
+        403: {"description": "Insufficient permissions"},
+    },
+)
 
 
 @router.get("", status_code=200, response_model=HouseListResponse)

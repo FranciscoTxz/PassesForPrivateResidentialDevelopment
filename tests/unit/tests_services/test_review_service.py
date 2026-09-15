@@ -26,7 +26,7 @@ def patch_openai_client(monkeypatch, completion):
     """Replaces the module-level _openai_client with a mock."""
     mock_client = MagicMock()
     mock_client.chat.completions.create.return_value = completion
-    monkeypatch.setattr(review_service_module, "_openai_client", mock_client)
+    monkeypatch.setattr(review_service_module, "_deepseek_client", mock_client)
     return mock_client
 
 
@@ -37,8 +37,8 @@ class TestReviewPass:
     # ── credenciales ausentes ──────────────────────────────────────────────────
 
     def test_raises_423_when_no_api_endpoint(self, monkeypatch):
-        monkeypatch.setattr(review_service_module, "OPENAI_API_ENDPOINT", "")
-        monkeypatch.setattr(review_service_module, "OPENAI_API_KEY", "some-key")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_BASE", "")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_KEY", "some-key")
 
         with pytest.raises(HTTPException) as exc_info:
             ReviewService.review_pass("I need access for a week")
@@ -47,9 +47,9 @@ class TestReviewPass:
 
     def test_raises_423_when_no_api_key(self, monkeypatch):
         monkeypatch.setattr(
-            review_service_module, "OPENAI_API_ENDPOINT", "https://fake.endpoint"
+            review_service_module, "DEEPSEEK_API_BASE", "https://fake.endpoint"
         )
-        monkeypatch.setattr(review_service_module, "OPENAI_API_KEY", "")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_KEY", "")
 
         with pytest.raises(HTTPException) as exc_info:
             ReviewService.review_pass("I need access for a week")
@@ -57,8 +57,8 @@ class TestReviewPass:
         assert exc_info.value.status_code == 423
 
     def test_raises_423_when_both_credentials_missing(self, monkeypatch):
-        monkeypatch.setattr(review_service_module, "OPENAI_API_ENDPOINT", "")
-        monkeypatch.setattr(review_service_module, "OPENAI_API_KEY", "")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_BASE", "")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_KEY", "")
 
         with pytest.raises(HTTPException) as exc_info:
             ReviewService.review_pass("I need access for a week")
@@ -66,8 +66,8 @@ class TestReviewPass:
         assert exc_info.value.status_code == 423
 
     def test_423_detail_message(self, monkeypatch):
-        monkeypatch.setattr(review_service_module, "OPENAI_API_ENDPOINT", "")
-        monkeypatch.setattr(review_service_module, "OPENAI_API_KEY", "")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_BASE", "")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_KEY", "")
 
         with pytest.raises(HTTPException) as exc_info:
             ReviewService.review_pass("request")
@@ -78,9 +78,9 @@ class TestReviewPass:
 
     def test_returns_approved_review_schema(self, monkeypatch):
         monkeypatch.setattr(
-            review_service_module, "OPENAI_API_ENDPOINT", "https://fake.endpoint"
+            review_service_module, "DEEPSEEK_API_BASE", "https://fake.endpoint"
         )
-        monkeypatch.setattr(review_service_module, "OPENAI_API_KEY", "secret")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_KEY", "secret")
 
         completion = make_mock_completion(
             approved=True, reason="Multi-day construction work with full details."
@@ -94,9 +94,9 @@ class TestReviewPass:
 
     def test_returns_denied_review_schema(self, monkeypatch):
         monkeypatch.setattr(
-            review_service_module, "OPENAI_API_ENDPOINT", "https://fake.endpoint"
+            review_service_module, "DEEPSEEK_API_BASE", "https://fake.endpoint"
         )
-        monkeypatch.setattr(review_service_module, "OPENAI_API_KEY", "secret")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_KEY", "secret")
 
         completion = make_mock_completion(
             approved=False, reason="Vague purpose, no contact info provided."
@@ -112,9 +112,9 @@ class TestReviewPass:
 
     def test_openai_client_called_with_correct_model(self, monkeypatch):
         monkeypatch.setattr(
-            review_service_module, "OPENAI_API_ENDPOINT", "https://fake.endpoint"
+            review_service_module, "DEEPSEEK_API_BASE", "https://fake.endpoint"
         )
-        monkeypatch.setattr(review_service_module, "OPENAI_API_KEY", "secret")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_KEY", "secret")
 
         completion = make_mock_completion(approved=True, reason="Looks good.")
         mock_client = patch_openai_client(monkeypatch, completion)
@@ -122,13 +122,13 @@ class TestReviewPass:
         ReviewService.review_pass("Some valid request")
 
         _, kwargs = mock_client.chat.completions.create.call_args
-        assert kwargs["model"] == review_service_module.MODEL
+        assert kwargs["model"] == review_service_module.DEEPSEEK_MODEL
 
     def test_openai_client_receives_user_message(self, monkeypatch):
         monkeypatch.setattr(
-            review_service_module, "OPENAI_API_ENDPOINT", "https://fake.endpoint"
+            review_service_module, "DEEPSEEK_API_BASE", "https://fake.endpoint"
         )
-        monkeypatch.setattr(review_service_module, "OPENAI_API_KEY", "secret")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_KEY", "secret")
 
         completion = make_mock_completion(approved=True, reason="Looks good.")
         mock_client = patch_openai_client(monkeypatch, completion)
@@ -144,9 +144,9 @@ class TestReviewPass:
 
     def test_openai_client_prompt_includes_system_role(self, monkeypatch):
         monkeypatch.setattr(
-            review_service_module, "OPENAI_API_ENDPOINT", "https://fake.endpoint"
+            review_service_module, "DEEPSEEK_API_BASE", "https://fake.endpoint"
         )
-        monkeypatch.setattr(review_service_module, "OPENAI_API_KEY", "secret")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_KEY", "secret")
 
         completion = make_mock_completion(approved=False, reason="Missing details.")
         mock_client = patch_openai_client(monkeypatch, completion)
@@ -159,9 +159,9 @@ class TestReviewPass:
 
     def test_stream_is_false(self, monkeypatch):
         monkeypatch.setattr(
-            review_service_module, "OPENAI_API_ENDPOINT", "https://fake.endpoint"
+            review_service_module, "DEEPSEEK_API_BASE", "https://fake.endpoint"
         )
-        monkeypatch.setattr(review_service_module, "OPENAI_API_KEY", "secret")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_KEY", "secret")
 
         completion = make_mock_completion(approved=True, reason="Fine. is very cooool")
         mock_client = patch_openai_client(monkeypatch, completion)
@@ -175,13 +175,13 @@ class TestReviewPass:
 
     def test_raises_500_on_openai_exception(self, monkeypatch):
         monkeypatch.setattr(
-            review_service_module, "OPENAI_API_ENDPOINT", "https://fake.endpoint"
+            review_service_module, "DEEPSEEK_API_BASE", "https://fake.endpoint"
         )
-        monkeypatch.setattr(review_service_module, "OPENAI_API_KEY", "secret")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_KEY", "secret")
 
         mock_client = MagicMock()
         mock_client.chat.completions.create.side_effect = Exception("Connection error")
-        monkeypatch.setattr(review_service_module, "_openai_client", mock_client)
+        monkeypatch.setattr(review_service_module, "_deepseek_client", mock_client)
 
         with pytest.raises(HTTPException) as exc_info:
             ReviewService.review_pass("Some request")
@@ -190,9 +190,9 @@ class TestReviewPass:
 
     def test_raises_500_on_invalid_json_response(self, monkeypatch):
         monkeypatch.setattr(
-            review_service_module, "OPENAI_API_ENDPOINT", "https://fake.endpoint"
+            review_service_module, "DEEPSEEK_API_BASE", "https://fake.endpoint"
         )
-        monkeypatch.setattr(review_service_module, "OPENAI_API_KEY", "secret")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_KEY", "secret")
 
         message = MagicMock()
         message.content = "this is not valid json {"
@@ -203,7 +203,7 @@ class TestReviewPass:
 
         mock_client = MagicMock()
         mock_client.chat.completions.create.return_value = completion
-        monkeypatch.setattr(review_service_module, "_openai_client", mock_client)
+        monkeypatch.setattr(review_service_module, "_deepseek_client", mock_client)
 
         with pytest.raises(HTTPException) as exc_info:
             ReviewService.review_pass("Some request")
@@ -212,9 +212,9 @@ class TestReviewPass:
 
     def test_raises_500_on_schema_validation_failure(self, monkeypatch):
         monkeypatch.setattr(
-            review_service_module, "OPENAI_API_ENDPOINT", "https://fake.endpoint"
+            review_service_module, "DEEPSEEK_API_BASE", "https://fake.endpoint"
         )
-        monkeypatch.setattr(review_service_module, "OPENAI_API_KEY", "secret")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_KEY", "secret")
 
         # JSON válido pero con campos incorrectos para ReviewSchema
         message = MagicMock()
@@ -226,7 +226,7 @@ class TestReviewPass:
 
         mock_client = MagicMock()
         mock_client.chat.completions.create.return_value = completion
-        monkeypatch.setattr(review_service_module, "_openai_client", mock_client)
+        monkeypatch.setattr(review_service_module, "_deepseek_client", mock_client)
 
         with pytest.raises(HTTPException) as exc_info:
             ReviewService.review_pass("Some request")
@@ -235,13 +235,13 @@ class TestReviewPass:
 
     def test_500_detail_message(self, monkeypatch):
         monkeypatch.setattr(
-            review_service_module, "OPENAI_API_ENDPOINT", "https://fake.endpoint"
+            review_service_module, "DEEPSEEK_API_BASE", "https://fake.endpoint"
         )
-        monkeypatch.setattr(review_service_module, "OPENAI_API_KEY", "secret")
+        monkeypatch.setattr(review_service_module, "DEEPSEEK_API_KEY", "secret")
 
         mock_client = MagicMock()
         mock_client.chat.completions.create.side_effect = Exception("Timeout")
-        monkeypatch.setattr(review_service_module, "_openai_client", mock_client)
+        monkeypatch.setattr(review_service_module, "_deepseek_client", mock_client)
 
         with pytest.raises(HTTPException) as exc_info:
             ReviewService.review_pass("Some request")

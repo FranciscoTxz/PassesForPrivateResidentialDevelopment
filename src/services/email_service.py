@@ -1,3 +1,4 @@
+import html
 import smtplib
 import ssl
 from email.mime.image import MIMEImage
@@ -37,13 +38,13 @@ class EmailService:
             template = f.read()
 
         return template.format(
-            pass_id=pass_id,
-            user_name=user_name,
-            date_range=date_range,
-            guest_name=guest_name,
-            house_id=house_id,
+            pass_id=html.escape(str(pass_id)),
+            user_name=html.escape(str(user_name)),
+            date_range=html.escape(str(date_range)),
+            guest_name=html.escape(str(guest_name)),
+            house_id=html.escape(str(house_id)),
             approved="Approved" if approved else "Rejected",
-            reason=reason,
+            reason=html.escape(str(reason)),
             qr_code='<p><img src="cid:qr_image" alt="QR Code" style="max-width:200px;" /></p>'
             if approved
             else "",

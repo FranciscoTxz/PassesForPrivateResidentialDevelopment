@@ -35,6 +35,8 @@ class GatehouseService:
             raise HTTPException(status_code=404, detail="House not found")
         if not pass_obj.enabled:
             raise HTTPException(status_code=400, detail="Pass is not enabled")
+        if pass_obj.used and pass_obj.pass_type != "visit for days":
+            raise HTTPException(status_code=400, detail="Pass has already been used")
         now = datetime.now(UTC).replace(tzinfo=None)
         if pass_obj.valid_from and pass_obj.valid_from > now:
             raise HTTPException(status_code=400, detail="Pass is not valid yet")

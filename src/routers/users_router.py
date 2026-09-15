@@ -10,7 +10,14 @@ from schemas.users_schema import (
 )
 from services.users_service import UserService
 
-router = APIRouter(prefix="/users", tags=["Users"])
+router = APIRouter(
+    prefix="/users",
+    tags=["Users"],
+    responses={
+        401: {"description": "Missing or invalid authentication token"},
+        403: {"description": "Insufficient permissions"},
+    },
+)
 
 
 @router.get("", status_code=200, response_model=UserListResponse)

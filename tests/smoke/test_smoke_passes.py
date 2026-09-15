@@ -79,6 +79,21 @@ def test_create_pass_for_days_success(user_client, dynamo_client):
     assert "pending approval" in data["message"]
 
 
+def test_create_pass_for_days_past_date_raises_400(user_client, dynamo_client):
+    past = (datetime.now(UTC) - timedelta(hours=1)).isoformat()
+    response = user_client.post(
+        "/passes/days",
+        json={
+            "days": 2,
+            "guest_name": "Past Guest",
+            "valid_from": past,
+            "reason": "This date is already in the past",
+        },
+    )
+    assert response.status_code == 400
+    assert response.json()["message"] == "Validation error"
+
+
 def test_create_pass_for_days_invalid_days(user_client, dynamo_client):
     response = user_client.post(
         "/passes/days",

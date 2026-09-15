@@ -1,12 +1,12 @@
 import csv
 from contextlib import suppress
-from hashlib import sha1
 
 from mongoengine import connect, disconnect
 from pymongo.errors import PyMongoError
 
 from commons.constants import MONGODB_URI
 from commons.log_helper import get_logger
+from commons.security import hash_password
 
 _LOG = get_logger(__name__)
 
@@ -86,9 +86,9 @@ def _seed_admins_table() -> None:
                     full_name=f"{row_dict['first_name']} {row_dict['last_name']}",
                     birthdate=row_dict["birthdate"],
                     phone_number=row_dict["phone_number"],
-                    password_hash=sha1(
-                        f"{row_dict['password']}{row_dict['email']}".encode()
-                    ).hexdigest(),
+                    password_hash=hash_password(
+                        row_dict["password"], row_dict["email"]
+                    ),
                     role="admin",
                 ).save()
 

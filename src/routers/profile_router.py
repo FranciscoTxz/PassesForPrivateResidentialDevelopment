@@ -11,7 +11,11 @@ from schemas.users_schema import (
 )
 from services.users_service import UserService
 
-router = APIRouter(prefix="/profile", tags=["Profile"])
+router = APIRouter(
+    prefix="/profile",
+    tags=["Profile"],
+    responses={401: {"description": "Missing or invalid authentication token"}},
+)
 
 
 @router.get("", status_code=200, response_model=UserProfileResponse)

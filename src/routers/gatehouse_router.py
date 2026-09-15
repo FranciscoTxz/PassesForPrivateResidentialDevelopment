@@ -1,13 +1,21 @@
 from fastapi import APIRouter, Depends
 
 from commons.auth import get_current_user_info, validate_gatehouse_token
+from schemas.gatehouse_schema import GatehouseTokenResponse
 from schemas.users_schema import MessageResponse, UserInfo
 from services.gatehouse_service import GatehouseService
 
-router = APIRouter(prefix="/gatehouse", tags=["Gatehouse"])
+router = APIRouter(
+    prefix="/gatehouse",
+    tags=["Gatehouse"],
+    responses={
+        401: {"description": "Missing or invalid authentication token"},
+        403: {"description": "Insufficient permissions"},
+    },
+)
 
 
-@router.post("/token", status_code=200, response_model=dict)
+@router.post("/token", status_code=200, response_model=GatehouseTokenResponse)
 def get_token(
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
 ):

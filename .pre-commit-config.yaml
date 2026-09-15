@@ -10,6 +10,7 @@ repos:
       - id: requirements-txt-fixer
       - id: pretty-format-json
         args: ["--autofix"]
+        exclude: "^openapi\\.json$"
       - id: check-json
       - id: check-toml
       - id: check-yaml
