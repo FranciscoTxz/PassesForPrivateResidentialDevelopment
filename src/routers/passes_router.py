@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, Query
+from typing import Any
+
+from fastapi import APIRouter, BackgroundTasks, Depends, Query
 
 from commons.auth import get_current_user_info
 from schemas.passes_schema import (
@@ -16,12 +18,23 @@ from schemas.passes_schema import (
 from schemas.users_schema import MessageResponse, UserInfo
 from services.passes_service import PassesService
 
-router = APIRouter(prefix="/passes", tags=["Passes"])
+AUTH_ERROR_RESPONSES: dict[int | str, dict[str, Any]] = {
+    401: {"description": "Missing or invalid authentication token"},
+    403: {"description": "Insufficient permissions"},
+}
+
+router = APIRouter(prefix="/passes", tags=["Passes"], responses=AUTH_ERROR_RESPONSES)
 
 
-@router.post("", status_code=201, response_model=PassCreatedResponse)
+@router.post(
+    "",
+    status_code=201,
+    response_model=PassCreatedResponse,
+    responses={404: {"description": "House user not found"}},
+)
 def create_simple_pass(
     payload: CreatePassesSimple,
+    background_tasks: BackgroundTasks,
     user_info: UserInfo = Depends(get_current_user_info(validate_owner=True)),
 ):
     return PassesService.create_simple_pass(
@@ -29,6 +42,7 @@ def create_simple_pass(
         guest_name=payload.guest_name,
         valid_from=payload.valid_from,
         house_id=user_info.house_id or "",
+        background_tasks=background_tasks,
     )
 
 
@@ -98,23 +112,49 @@ def get_pending_passes(
 @router.patch("/{pass_id}/approve", status_code=200, response_model=MessageResponse)
 def approve_pass(
     pass_id: str,
+    background_tasks: BackgroundTasks,
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
 ):
-    return PassesService.approve_pass(pass_id)
+    return PassesService.approve_pass(pass_id, background_tasks=background_tasks)
 
 
-@router.delete("/{pass_id}/reject", status_code=200, response_model=MessageResponse)
+@router.post(
+    "/{pass_id}/reject",
+    status_code=200,
+    response_model=MessageResponse,
+    summary="Reject a pending pass",
+)
 def reject_pass(
     pass_id: str,
+    background_tasks: BackgroundTasks,
     reason: str = Query(...),
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
 ):
-    return PassesService.reject_pass(pass_id, reason)
+    return PassesService.reject_pass(pass_id, reason, background_tasks=background_tasks)
+
+
+@router.delete(
+    "/{pass_id}/reject",
+    status_code=200,
+    response_model=MessageResponse,
+    deprecated=True,
+    summary="Reject a pending pass (deprecated, use POST)",
+)
+def reject_pass_deprecated(
+    pass_id: str,
+    background_tasks: BackgroundTasks,
+    reason: str = Query(...),
+    user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
+):
+    return PassesService.reject_pass(pass_id, reason, background_tasks=background_tasks)
 
 
 @router.patch("/{pass_id}/auto-review", status_code=200, response_model=ReviewSchema)
 def auto_review_pass(
     pass_id: str,
+    background_tasks: BackgroundTasks,
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
 ):
-    return PassesService.review_pass_automatically(pass_id)
+    return PassesService.review_pass_automatically(
+        pass_id, background_tasks=background_tasks
+    )

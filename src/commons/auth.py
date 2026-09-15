@@ -1,5 +1,6 @@
 import jwt
-from fastapi import Header, HTTPException
+from fastapi import Header, HTTPException, Security
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from mongoengine import DoesNotExist
 
 from commons.constants import SECRET_KEY
@@ -7,11 +8,42 @@ from models.users import Users
 from schemas.users_schema import UserInfo
 from services.users_service import UserService
 
+bearer_scheme = HTTPBearer(auto_error=False)
+
+
+def _extract_token(
+    authorization: str | None,
+    credentials: HTTPAuthorizationCredentials | None,
+) -> str | None:
+    """Accept both `Authorization: Bearer <token>` and a raw token header."""
+    token: str | None = None
+    if credentials is not None and getattr(credentials, "credentials", None):
+        token = credentials.credentials
+    elif isinstance(authorization, str):
+        token = authorization
+
+    if not token:
+        return None
+
+    token = token.strip()
+    if token.lower().startswith("bearer "):
+        token = token[7:].strip()
+    return token or None
+
 
 def get_current_user_info(validate_owner: bool = False, validate_admin: bool = False):
-    def verify_token(authorization: str = Header(None)) -> UserInfo:
+    def verify_token(
+        authorization: str | None = Header(None),
+        credentials: HTTPAuthorizationCredentials | None = Security(bearer_scheme),
+    ) -> UserInfo:
         try:
-            attributes = jwt.decode(authorization, SECRET_KEY, algorithms=["HS256"])
+            token = _extract_token(authorization, credentials)
+            if not token:
+                raise HTTPException(
+                    status_code=401, detail="Unauthorized: Missing or invalid token"
+                )
+
+            attributes = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             email = attributes.get("email", None)
             if not email:
                 raise HTTPException(
@@ -56,9 +88,18 @@ def get_current_user_info(validate_owner: bool = False, validate_admin: bool = F
 
 
 def validate_gatehouse_token():
-    def validate_token(authorization: str = Header(None)):
+    def validate_token(
+        authorization: str | None = Header(None),
+        credentials: HTTPAuthorizationCredentials | None = Security(bearer_scheme),
+    ):
         try:
-            attributes = jwt.decode(authorization, SECRET_KEY, algorithms=["HS256"])
+            token = _extract_token(authorization, credentials)
+            if not token:
+                raise HTTPException(
+                    status_code=401, detail="Unauthorized: Missing or invalid token"
+                )
+
+            attributes = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             if attributes.get("role") != "gatehouse":
                 raise HTTPException(
                     status_code=403,

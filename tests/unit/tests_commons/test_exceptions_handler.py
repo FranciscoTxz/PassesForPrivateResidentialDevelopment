@@ -1,4 +1,5 @@
 import asyncio
+import json
 from unittest.mock import MagicMock
 
 from fastapi import FastAPI
@@ -56,6 +57,33 @@ def test_validation_handler_returns_400_with_errors(monkeypatch):
         b'{"message":"Validation error","errors":[{"loc":["body","email"],"msg":"Field required","type":"missing"}]}'
     )
     mock_logger.warning.assert_called_once()
+
+
+def test_validation_handler_serializes_value_error_ctx(monkeypatch):
+    app = FastAPI()
+    monkeypatch.setattr(exception_module, "_LOG", MagicMock())
+    register_exception_handlers(app)
+
+    handler = app.exception_handlers[RequestValidationError]
+    request = _build_request("/validation")
+    exc = RequestValidationError(
+        [
+            {
+                "type": "value_error",
+                "loc": ("body", "valid_from"),
+                "msg": "Value error, valid_from must be in the future",
+                "input": "2026-09-15T11:00:00.000-06:00",
+                "ctx": {"error": ValueError("valid_from must be in the future")},
+            }
+        ]
+    )
+
+    response = asyncio.run(handler(request, exc))
+
+    assert response.status_code == 400
+    body = json.loads(response.body)
+    assert body["message"] == "Validation error"
+    assert body["errors"][0]["ctx"]["error"] == "valid_from must be in the future"
 
 
 def test_http_exception_handler_returns_original_status_for_4xx(monkeypatch):

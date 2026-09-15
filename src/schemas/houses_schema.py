@@ -2,10 +2,10 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class CreateHouse(BaseModel):
-    id: str | None = None
-    number: int
-    street: str
-    extra: str | None = None
+    id: str | None = Field(default=None, min_length=1, max_length=50)
+    number: int = Field(gt=0)
+    street: str = Field(min_length=1, max_length=120)
+    extra: str | None = Field(default=None, max_length=120)
 
 
 class HouseRecord(BaseModel):
