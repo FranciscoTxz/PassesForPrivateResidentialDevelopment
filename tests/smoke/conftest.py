@@ -2,7 +2,6 @@ import csv
 import os
 import time
 from collections.abc import Generator
-from hashlib import sha1
 
 import pytest
 from fastapi.testclient import TestClient
@@ -11,6 +10,7 @@ from mongoengine.connection import get_db
 from pymongo import MongoClient
 from testcontainers.core.container import DockerContainer
 
+from commons.security import hash_password
 from models.houses import Houses
 from models.passes import Passes
 from models.users import Users
@@ -126,7 +126,7 @@ def create_fixed_tables(mongo_connection):
             ).save()
 
     for user in USERS_FIXTURE_DATA:
-        password_hash = sha1(f"{user['password']}{user['email']}".encode()).hexdigest()
+        password_hash = hash_password(user["password"], user["email"])
         Users(
             email=user["email"],
             first_name=user["first_name"],

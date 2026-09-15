@@ -1,12 +1,13 @@
 import re
 from datetime import UTC, date, datetime, timedelta
-from hashlib import sha1
 
 import jwt
 from fastapi import HTTPException
 from mongoengine import DoesNotExist, Q
 
 from commons.constants import SECRET_KEY
+from commons.datetime_utils import utcnow_naive
+from commons.security import hash_password, needs_rehash, verify_password
 from models.houses import Houses
 from models.users import Users
 from schemas.users_schema import UserInfo
@@ -66,7 +67,7 @@ class UserService:
                 full_name=f"{first_name} {last_name}",
                 birthdate=birthdate.isoformat(),
                 phone_number=phone_number,
-                password_hash=sha1(f"{password}{email}".encode()).hexdigest(),
+                password_hash=hash_password(password, email),
             )
             user.save()
 
@@ -79,10 +80,13 @@ class UserService:
         except DoesNotExist:
             raise HTTPException(status_code=400, detail="Invalid email or password")
 
-        if (
-            user.password_hash != sha1(f"{password}{email}".encode()).hexdigest()
-        ) or not user.enabled:
+        if not verify_password(password, user.password_hash, email) or not user.enabled:
             raise HTTPException(status_code=400, detail="Invalid email or password")
+
+        if needs_rehash(user.password_hash):
+            user.password_hash = hash_password(password, email)
+            user.save()
+
         expire = datetime.now(UTC) + timedelta(hours=1)
 
         token = jwt.encode(
@@ -117,7 +121,7 @@ class UserService:
     def get_user_info_admin(email: str) -> dict:
         try:
             user = Users.objects.get(email=email)
-            return user.to_mongo()
+            return UserService._serialize_user_info(user)
         except DoesNotExist:
             raise HTTPException(status_code=404, detail="User not found")
 
@@ -137,7 +141,7 @@ class UserService:
         user.last_name = new_last_name or user.last_name
         user.full_name = f"{user.first_name} {user.last_name}"
         user.phone_number = new_phone_number or user.phone_number
-        user.updated_at = datetime.now()
+        user.updated_at = utcnow_naive()
         user.save()
         user.reload()
         return {
@@ -152,9 +156,9 @@ class UserService:
             user = Users.objects.get(email=email)
         except DoesNotExist:
             raise HTTPException(status_code=404, detail=USER_NOT_FOUND)
-        if user.password_hash != sha1(f"{old_password}{email}".encode()).hexdigest():
+        if not verify_password(old_password, user.password_hash, email):
             raise HTTPException(status_code=403, detail="Old password is incorrect.")
-        user.password_hash = sha1(f"{new_password}{email}".encode()).hexdigest()
+        user.password_hash = hash_password(new_password, email)
         user.save()
 
     @staticmethod

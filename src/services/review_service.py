@@ -1,17 +1,18 @@
 import json
 
 from fastapi import HTTPException
-from openai import AzureOpenAI
+from openai import OpenAI
 
-from commons.constants import OPENAI_API_ENDPOINT, OPENAI_API_KEY
+from commons.constants import (
+    DEEPSEEK_API_BASE,
+    DEEPSEEK_API_KEY,
+    DEEPSEEK_MODEL,
+)
 from commons.log_helper import get_logger
 from schemas.passes_schema import ReviewSchema
 
 _LOG = get_logger(__name__)
 
-
-MODEL = "gpt-4o-mini-2024-07-18"
-API_VERSION = "2025-01-01-preview"
 SYSTEM_PROMPT = """
 You are a gate access permission review system for a gated residential community (fraccionamiento).
 Your role is to evaluate user requests for multi-day access permissions (2+ days) and approve or deny them based on the provided information.
@@ -45,23 +46,22 @@ Respond ONLY with valid JSON matching this exact schema:
 Return only the JSON object, nothing else.
 """
 
-if not OPENAI_API_ENDPOINT or not OPENAI_API_KEY:
+if not DEEPSEEK_API_KEY:
     _LOG.warning(
-        "OpenAI API endpoint or key is not set. AI review functionality will be disabled."
+        "Deepseek API key is not set. AI review functionality will be disabled."
     )
 else:
-    _openai_client = AzureOpenAI(
-        azure_endpoint=OPENAI_API_ENDPOINT,
-        api_key=OPENAI_API_KEY,
-        api_version=API_VERSION,
+    _deepseek_client = OpenAI(
+        api_key=DEEPSEEK_API_KEY,
+        base_url=DEEPSEEK_API_BASE,
     )
 
 
 class ReviewService:
     @staticmethod
     def review_pass(user_message: str) -> ReviewSchema:
-        if not OPENAI_API_ENDPOINT or not OPENAI_API_KEY:
-            _LOG.error("OpenAI API endpoint or key is not set. Cannot perform review.")
+        if not DEEPSEEK_API_KEY or not DEEPSEEK_API_BASE:
+            _LOG.error("Deepseek API key is not set. Cannot perform review.")
             raise HTTPException(
                 status_code=423,
                 detail="AI review service is currently unavailable. Please try again later.",
@@ -70,12 +70,12 @@ class ReviewService:
             chat_prompt = [
                 {
                     "role": "system",
-                    "content": [{"type": "text", "text": SYSTEM_PROMPT}],
+                    "content": SYSTEM_PROMPT,
                 },
-                {"role": "user", "content": [{"type": "text", "text": user_message}]},
+                {"role": "user", "content": user_message},
             ]
-            completion = _openai_client.chat.completions.create(
-                model=MODEL,
+            completion = _deepseek_client.chat.completions.create(
+                model=DEEPSEEK_MODEL,
                 messages=chat_prompt,
                 max_tokens=1000,
                 temperature=0.5,
@@ -83,6 +83,7 @@ class ReviewService:
                 presence_penalty=0,
                 stop=None,
                 stream=False,
+                response_format={"type": "json_object"},
                 timeout=10,
             )
 

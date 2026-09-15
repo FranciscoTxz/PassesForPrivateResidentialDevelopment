@@ -1,9 +1,10 @@
 import asyncio
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 
-from fastapi import HTTPException
+from fastapi import BackgroundTasks, HTTPException
 from mongoengine import DoesNotExist, Q
 
+from commons.datetime_utils import utcnow_naive
 from commons.log_helper import get_logger
 from models.passes import Passes
 from services.email_service import EmailService
@@ -13,10 +14,46 @@ from services.review_service import ReviewService
 _LOG = get_logger(__name__)
 
 
+def _send_review_email(
+    background_tasks: BackgroundTasks | None,
+    *,
+    pass_id: str,
+    target_house: str,
+    guest_name: str,
+    date_range: str,
+    approved: bool,
+    reason: str,
+) -> None:
+    """Send the review email, offloading it when a BackgroundTasks is available."""
+    if background_tasks is not None:
+        background_tasks.add_task(
+            EmailService.send_review_email_via_smtp,
+            pass_id=pass_id,
+            target_house=target_house,
+            guest_name=guest_name,
+            date_range=date_range,
+            approved=approved,
+            reason=reason,
+        )
+    else:
+        EmailService.send_review_email_via_smtp(
+            pass_id=pass_id,
+            target_house=target_house,
+            guest_name=guest_name,
+            date_range=date_range,
+            approved=approved,
+            reason=reason,
+        )
+
+
 class PassesService:
     @staticmethod
     def create_simple_pass(
-        pass_type: str, guest_name: str, valid_from: datetime, house_id: str
+        pass_type: str,
+        guest_name: str,
+        valid_from: datetime,
+        house_id: str,
+        background_tasks: BackgroundTasks | None = None,
     ):
         time = {"temporary": 5, "temporary_party": 6, "temporary_gym": 3}
         valid_until = valid_from + timedelta(hours=time.get(pass_type, 1))
@@ -32,7 +69,8 @@ class PassesService:
 
         date_range = f"{new_pass.valid_from.strftime('%Y-%m-%d %H:%M')} to {new_pass.valid_until.strftime('%Y-%m-%d %H:%M')}"
 
-        EmailService.send_review_email_via_smtp(
+        _send_review_email(
+            background_tasks,
             pass_id=new_pass.id,
             target_house=new_pass.house_id,
             guest_name=new_pass.guest_name,
@@ -123,7 +161,9 @@ class PassesService:
         return [pass_obj.to_mongo() for pass_obj in passes]
 
     @staticmethod
-    def review_pass_automatically(pass_id: str):
+    def review_pass_automatically(
+        pass_id: str, background_tasks: BackgroundTasks | None = None
+    ):
         try:
             pass_obj: Passes = Passes.objects.get(id=pass_id, status="pending")
         except DoesNotExist:
@@ -140,7 +180,8 @@ class PassesService:
 
         date_range = f"{pass_obj.valid_from.strftime('%Y-%m-%d %H:%M')} to {pass_obj.valid_until.strftime('%Y-%m-%d %H:%M')}"
 
-        EmailService.send_review_email_via_smtp(
+        _send_review_email(
+            background_tasks,
             pass_id=pass_obj.id,
             target_house=pass_obj.house_id,
             guest_name=pass_obj.guest_name,
@@ -152,7 +193,7 @@ class PassesService:
         return result
 
     @staticmethod
-    def approve_pass(pass_id: str):
+    def approve_pass(pass_id: str, background_tasks: BackgroundTasks | None = None):
         try:
             pass_obj = Passes.objects.get(id=pass_id)
         except DoesNotExist:
@@ -167,7 +208,8 @@ class PassesService:
 
         date_range = f"{pass_obj.valid_from.strftime('%Y-%m-%d %H:%M')} to {pass_obj.valid_until.strftime('%Y-%m-%d %H:%M')}"
 
-        EmailService.send_review_email_via_smtp(
+        _send_review_email(
+            background_tasks,
             pass_id=pass_obj.id,
             target_house=pass_obj.house_id,
             guest_name=pass_obj.guest_name,
@@ -179,18 +221,27 @@ class PassesService:
         return {"message": "Pass approved successfully"}
 
     @staticmethod
-    def reject_pass(pass_id: str, reason: str):
+    def reject_pass(
+        pass_id: str,
+        reason: str,
+        background_tasks: BackgroundTasks | None = None,
+    ):
         try:
             pass_obj = Passes.objects.get(id=pass_id)
         except DoesNotExist:
             raise HTTPException(status_code=404, detail="Pass not found")
+        if pass_obj.status != "pending":
+            raise HTTPException(
+                status_code=400, detail="Only pending passes can be rejected"
+            )
         pass_obj.enabled = False
         pass_obj.status = "rejected"
         pass_obj.save()
 
         date_range = f"{pass_obj.valid_from.strftime('%Y-%m-%d %H:%M')} to {pass_obj.valid_until.strftime('%Y-%m-%d %H:%M')}"
 
-        EmailService.send_review_email_via_smtp(
+        _send_review_email(
+            background_tasks,
             pass_id=pass_obj.id,
             target_house=pass_obj.house_id,
             guest_name=pass_obj.guest_name,
@@ -205,7 +256,7 @@ class PassesService:
 async def update_passes_status():
     while True:
         _LOG.info("Checking for expired passes...")
-        now = datetime.now(UTC)
+        now = utcnow_naive()
         Passes.objects(valid_until__lte=now, enabled=True).update(
             enabled=False, status="expired"
         )

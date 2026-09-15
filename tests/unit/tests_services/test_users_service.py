@@ -1,5 +1,4 @@
 from datetime import date
-from hashlib import sha1
 from unittest.mock import MagicMock
 
 import pytest
@@ -7,6 +6,7 @@ from fastapi import HTTPException
 from mongoengine import DoesNotExist
 
 import services.users_service as users_service_module
+from commons.security import hash_password, verify_password
 from services.users_service import UserService
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -20,7 +20,7 @@ def make_mock_user(**overrides):
     user.full_name = "John Doe"
     user.birthdate = "1990-01-01"
     user.phone_number = "+12345678901"
-    user.password_hash = sha1(b"Password1!user@example.com").hexdigest()
+    user.password_hash = hash_password("Password1!", "user@example.com")
     user.enabled = True
     user.house_id = None
     user.role = "user"
@@ -37,7 +37,7 @@ def make_mock_user_with_house(**overrides):
     user.full_name = "Jean Paul"
     user.birthdate = "1999-10-11"
     user.phone_number = "+12345678901"
-    user.password_hash = sha1(b"Password1!user@example.com").hexdigest()
+    user.password_hash = hash_password("Password1!", "user@example.com")
     user.enabled = True
     user.house_id = "SV101"
     user.role = "user"
@@ -102,7 +102,7 @@ class TestSignupUser:
 class TestLoginUser:
     def test_login_success_returns_token(self, monkeypatch):
         user = make_mock_user(
-            password_hash=sha1(b"Password1!user@example.com").hexdigest()
+            password_hash=hash_password("Password1!", "user@example.com")
         )
         mock_users = MagicMock()
         mock_users.objects.get.return_value = user
@@ -137,7 +137,7 @@ class TestLoginUser:
     def test_login_disabled_user_raises_400(self, monkeypatch):
         user = make_mock_user(
             enabled=False,
-            password_hash=sha1(b"Password1!user@example.com").hexdigest(),
+            password_hash=hash_password("Password1!", "user@example.com"),
         )
         mock_users = MagicMock()
         mock_users.objects.get.return_value = user
@@ -212,7 +212,7 @@ class TestUpdateProfileInfo:
 class TestUpdatePassword:
     def test_updates_password_successfully(self, monkeypatch):
         user = make_mock_user(
-            password_hash=sha1(b"OldPass1!user@example.com").hexdigest()
+            password_hash=hash_password("OldPass1!", "user@example.com")
         )
         mock_users = MagicMock()
         mock_users.objects.get.return_value = user
@@ -220,12 +220,12 @@ class TestUpdatePassword:
 
         UserService.update_password("user@example.com", "OldPass1!", "NewPass1!")
 
-        assert user.password_hash == sha1(b"NewPass1!user@example.com").hexdigest()
+        assert verify_password("NewPass1!", user.password_hash, "user@example.com")
         user.save.assert_called_once()
 
     def test_wrong_old_password_raises_403(self, monkeypatch):
         user = make_mock_user(
-            password_hash=sha1(b"OldPass1!user@example.com").hexdigest()
+            password_hash=hash_password("OldPass1!", "user@example.com")
         )
         mock_users = MagicMock()
         mock_users.objects.get.return_value = user
@@ -509,16 +509,17 @@ class TestLinkHouse:
 
 
 class TestGetUserInfoAdmin:
-    def test_returns_mongo_dict(self, monkeypatch):
+    def test_returns_serialized_user(self, monkeypatch):
         user = make_mock_user()
-        user.to_mongo.return_value = {"email": "user@example.com"}
         mock_users = MagicMock()
         mock_users.objects.get.return_value = user
         monkeypatch.setattr(users_service_module, "Users", mock_users)
 
         result = UserService.get_user_info_admin("user@example.com")
 
-        assert result == {"email": "user@example.com"}
+        assert result["email"] == "user@example.com"
+        assert result["full_name"] == "John Doe"
+        assert "password_hash" not in result
 
     def test_not_found_raises_404(self, monkeypatch):
         mock_users = MagicMock()

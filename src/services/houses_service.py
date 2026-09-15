@@ -2,6 +2,8 @@ from fastapi import HTTPException
 from mongoengine import DoesNotExist, Q
 
 from models.houses import Houses
+from models.passes import Passes
+from models.users import Users
 
 
 class HouseService:
@@ -110,6 +112,18 @@ class HouseService:
     def delete_house_by_id(house_id: str):
         try:
             house = Houses.objects.get(id=house_id)
-            house.delete()
         except DoesNotExist:
             raise HTTPException(status_code=404, detail="House not found")
+
+        if Users.objects(house_id=house_id).first() is not None:
+            raise HTTPException(
+                status_code=409,
+                detail="House is linked to a user and cannot be deleted",
+            )
+        if Passes.objects(house_id=house_id).first() is not None:
+            raise HTTPException(
+                status_code=409,
+                detail="House has associated passes and cannot be deleted",
+            )
+
+        house.delete()

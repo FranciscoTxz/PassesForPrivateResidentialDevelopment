@@ -252,15 +252,50 @@ class TestCreateHouse:
 
 
 class TestDeleteHouseById:
+    def _patch_related(self, monkeypatch, user=None, pass_obj=None):
+        mock_users = MagicMock()
+        mock_users.objects.return_value.first.return_value = user
+        mock_passes = MagicMock()
+        mock_passes.objects.return_value.first.return_value = pass_obj
+        monkeypatch.setattr(houses_service_module, "Users", mock_users)
+        monkeypatch.setattr(houses_service_module, "Passes", mock_passes)
+
     def test_deletes_house(self, monkeypatch):
         house = make_mock_house()
         mock_houses = MagicMock()
         mock_houses.objects.get.return_value = house
         monkeypatch.setattr(houses_service_module, "Houses", mock_houses)
+        self._patch_related(monkeypatch)
 
         HouseService.delete_house_by_id("MS1")
 
         house.delete.assert_called_once()
+
+    def test_linked_user_raises_409(self, monkeypatch):
+        house = make_mock_house()
+        mock_houses = MagicMock()
+        mock_houses.objects.get.return_value = house
+        monkeypatch.setattr(houses_service_module, "Houses", mock_houses)
+        self._patch_related(monkeypatch, user=MagicMock())
+
+        with pytest.raises(HTTPException) as exc_info:
+            HouseService.delete_house_by_id("MS1")
+
+        assert exc_info.value.status_code == 409
+        house.delete.assert_not_called()
+
+    def test_associated_passes_raises_409(self, monkeypatch):
+        house = make_mock_house()
+        mock_houses = MagicMock()
+        mock_houses.objects.get.return_value = house
+        monkeypatch.setattr(houses_service_module, "Houses", mock_houses)
+        self._patch_related(monkeypatch, pass_obj=MagicMock())
+
+        with pytest.raises(HTTPException) as exc_info:
+            HouseService.delete_house_by_id("MS1")
+
+        assert exc_info.value.status_code == 409
+        house.delete.assert_not_called()
 
     def test_not_found_raises_404(self, monkeypatch):
         mock_houses = MagicMock()

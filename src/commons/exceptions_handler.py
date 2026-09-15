@@ -10,6 +10,23 @@ from commons.log_helper import get_logger
 _LOG = get_logger(__name__)
 
 
+def _sanitize_validation_errors(errors) -> list[dict]:
+    """Make Pydantic validation errors JSON serializable.
+
+    Custom validators raise `ValueError`, which Pydantic exposes under
+    `ctx.error` as the exception instance. That object is not JSON
+    serializable, so its values are converted to strings.
+    """
+    sanitized = []
+    for error in errors:
+        item = dict(error)
+        context = item.get("ctx")
+        if context:
+            item["ctx"] = {key: str(value) for key, value in context.items()}
+        sanitized.append(item)
+    return sanitized
+
+
 def register_exception_handlers(app: "FastAPI") -> None:
     """Register all global exception handlers."""
 
@@ -18,7 +35,10 @@ def register_exception_handlers(app: "FastAPI") -> None:
         _LOG.warning(f"ValidationError; Path: {request.url}; Error: {exc}")
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"message": "Validation error", "errors": exc.errors()},
+            content={
+                "message": "Validation error",
+                "errors": _sanitize_validation_errors(exc.errors()),
+            },
         )
 
     @app.exception_handler(StarletteHTTPException)

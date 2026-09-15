@@ -1,13 +1,26 @@
 from fastapi import APIRouter, Depends, Query
 
 from commons.auth import get_current_user_info
-from schemas.users_schema import UserInfo
+from schemas.users_schema import (
+    MessageResponse,
+    UserByHouseResponse,
+    UserInfo,
+    UserListResponse,
+    UserPagesResponse,
+)
 from services.users_service import UserService
 
-router = APIRouter(prefix="/users", tags=["Users"])
+router = APIRouter(
+    prefix="/users",
+    tags=["Users"],
+    responses={
+        401: {"description": "Missing or invalid authentication token"},
+        403: {"description": "Insufficient permissions"},
+    },
+)
 
 
-@router.get("", status_code=200)
+@router.get("", status_code=200, response_model=UserListResponse)
 def get_users(
     query: str | None = Query(default=None),
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
@@ -22,7 +35,7 @@ def get_users(
     )
 
 
-@router.get("/house", status_code=200)
+@router.get("/house", status_code=200, response_model=UserByHouseResponse)
 def get_user_by_house_id(
     house_id: str = Query(),
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
@@ -30,7 +43,7 @@ def get_user_by_house_id(
     return UserService.get_user_by_house_id(house_id)
 
 
-@router.get("/pages", status_code=200)
+@router.get("/pages", status_code=200, response_model=UserPagesResponse)
 def get_users_pages(
     query: str | None = Query(default=None),
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
@@ -44,7 +57,7 @@ def get_users_pages(
     return {"total_pages": total_pages, "total_users": total_staff}
 
 
-@router.patch("", status_code=200)
+@router.patch("", status_code=200, response_model=MessageResponse)
 def make_user_admin(
     email: str = Query(...),
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
@@ -52,7 +65,7 @@ def make_user_admin(
     return UserService.make_user_admin(email)
 
 
-@router.patch("/disable", status_code=200)
+@router.patch("/disable", status_code=200, response_model=MessageResponse)
 def disable_staff(
     email: str = Query(...),
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
@@ -60,7 +73,7 @@ def disable_staff(
     return UserService.disable_user(user_id=email)
 
 
-@router.patch("/enable", status_code=200)
+@router.patch("/enable", status_code=200, response_model=MessageResponse)
 def enable_staff(
     email: str = Query(...),
     user_info: UserInfo = Depends(get_current_user_info(validate_admin=True)),
@@ -76,7 +89,7 @@ def delete_staff(
     UserService.delete_user(user_id=email)
 
 
-@router.patch("/link", status_code=200)
+@router.patch("/link", status_code=200, response_model=MessageResponse)
 def link_house(
     email: str = Query(...),
     house_id: str = Query(...),
