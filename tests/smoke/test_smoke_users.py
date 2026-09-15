@@ -98,7 +98,7 @@ def test_get_user_by_house(admin_client):
     assert response.status_code == 200
     data = response.json()
     assert "user" in data
-    assert data["user"]["email"] == "user_1@hot.com"
+    assert data["user"]["_id"] == "user_1@hot.com"
 
 
 def test_get_user_by_house_404(admin_client):

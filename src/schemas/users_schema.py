@@ -3,7 +3,7 @@ import unicodedata
 from datetime import date
 
 from fastapi import HTTPException
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 PHONE_RE = re.compile(r"^\+\d{10,12}$")
@@ -132,3 +132,58 @@ class UserPasswordUpdate(BaseModel):
                 detail=PASSWORD_REJECT,
             )
         return v
+
+
+class SignUpResponse(BaseModel):
+    message: str
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    user_full_name: str
+
+
+class UserProfileResponse(BaseModel):
+    Hi: str
+    email: EmailStr
+    role: str | None
+    house_id: str | None
+
+
+class UserProfileUpdateResponse(BaseModel):
+    message: str
+    full_name: str
+    phone_number: str
+
+
+class PasswordUpdatedResponse(BaseModel):
+    message: str
+
+
+class UserListItem(BaseModel):
+    email: EmailStr = Field(alias="_id")
+    full_name: str
+    enabled: bool
+    house_id: str | None = None
+    role: str | None = None
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class UserListResponse(BaseModel):
+    users: list[UserListItem]
+    has_next: bool
+    next_page: int | None = None
+
+
+class UserByHouseResponse(BaseModel):
+    user: UserListItem
+
+
+class UserPagesResponse(BaseModel):
+    total_pages: int
+    total_users: int
+
+
+class MessageResponse(BaseModel):
+    message: str

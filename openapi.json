@@ -1,0 +1,2354 @@
+{
+  "components": {
+    "schemas": {
+      "CreateHouse": {
+        "properties": {
+          "extra": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extra"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "street": {
+            "title": "Street",
+            "type": "string"
+          }
+        },
+        "required": [
+          "number",
+          "street"
+        ],
+        "title": "CreateHouse",
+        "type": "object"
+      },
+      "CreatePassesForDays": {
+        "properties": {
+          "days": {
+            "exclusiveMaximum": 8.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Days",
+            "type": "integer"
+          },
+          "guest_name": {
+            "maxLength": 100,
+            "minLength": 3,
+            "title": "Guest Name",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 300,
+            "minLength": 10,
+            "title": "Reason",
+            "type": "string"
+          },
+          "valid_from": {
+            "format": "date-time",
+            "title": "Valid From",
+            "type": "string"
+          }
+        },
+        "required": [
+          "days",
+          "guest_name",
+          "valid_from",
+          "reason"
+        ],
+        "title": "CreatePassesForDays",
+        "type": "object"
+      },
+      "CreatePassesSimple": {
+        "properties": {
+          "guest_name": {
+            "maxLength": 100,
+            "minLength": 3,
+            "title": "Guest Name",
+            "type": "string"
+          },
+          "pass_type": {
+            "$ref": "#/components/schemas/PassTypeSimple"
+          },
+          "valid_from": {
+            "format": "date-time",
+            "title": "Valid From",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pass_type",
+          "guest_name",
+          "valid_from"
+        ],
+        "title": "CreatePassesSimple",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HouseListResponse": {
+        "properties": {
+          "has_next": {
+            "title": "Has Next",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/HouseRecord"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items",
+          "has_next"
+        ],
+        "title": "HouseListResponse",
+        "type": "object"
+      },
+      "HouseRecord": {
+        "properties": {
+          "_id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "full_address": {
+            "title": "Full Address",
+            "type": "string"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "street": {
+            "title": "Street",
+            "type": "string"
+          }
+        },
+        "required": [
+          "_id",
+          "number",
+          "street",
+          "full_address"
+        ],
+        "title": "HouseRecord",
+        "type": "object"
+      },
+      "LogInUser": {
+        "properties": {
+          "email": {
+            "format": "email",
+            "title": "Email",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 16,
+            "minLength": 8,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "LogInUser",
+        "type": "object"
+      },
+      "LoginResponse": {
+        "properties": {
+          "access_token": {
+            "title": "Access Token",
+            "type": "string"
+          },
+          "user_full_name": {
+            "title": "User Full Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token",
+          "user_full_name"
+        ],
+        "title": "LoginResponse",
+        "type": "object"
+      },
+      "MessageResponse": {
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "MessageResponse",
+        "type": "object"
+      },
+      "PassCreatedForDaysResponse": {
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "pass_id": {
+            "title": "Pass Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "pass_id"
+        ],
+        "title": "PassCreatedForDaysResponse",
+        "type": "object"
+      },
+      "PassCreatedResponse": {
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "pass": {
+            "additionalProperties": true,
+            "title": "Pass",
+            "type": "object"
+          }
+        },
+        "required": [
+          "message",
+          "pass"
+        ],
+        "title": "PassCreatedResponse",
+        "type": "object"
+      },
+      "PassQRCodeResponse": {
+        "properties": {
+          "qr_jpg_code_base64": {
+            "title": "Qr Jpg Code Base64",
+            "type": "string"
+          }
+        },
+        "required": [
+          "qr_jpg_code_base64"
+        ],
+        "title": "PassQRCodeResponse",
+        "type": "object"
+      },
+      "PassTypeSimple": {
+        "enum": [
+          "temporary",
+          "temporary_party",
+          "temporary_gym"
+        ],
+        "title": "PassTypeSimple",
+        "type": "string"
+      },
+      "PassesPageResponse": {
+        "properties": {
+          "has_next": {
+            "title": "Has Next",
+            "type": "boolean"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "passes": {
+            "items": {
+              "$ref": "#/components/schemas/PassesResponseUser"
+            },
+            "title": "Passes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "passes",
+          "has_next"
+        ],
+        "title": "PassesPageResponse",
+        "type": "object"
+      },
+      "PassesResponseList": {
+        "properties": {
+          "passes": {
+            "items": {
+              "$ref": "#/components/schemas/PassesResponseUser"
+            },
+            "title": "Passes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "passes"
+        ],
+        "title": "PassesResponseList",
+        "type": "object"
+      },
+      "PassesResponseUser": {
+        "properties": {
+          "_id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "valid_from": {
+            "format": "date-time",
+            "title": "Valid From",
+            "type": "string"
+          },
+          "valid_until": {
+            "format": "date-time",
+            "title": "Valid Until",
+            "type": "string"
+          }
+        },
+        "required": [
+          "_id",
+          "status",
+          "enabled",
+          "valid_from",
+          "valid_until"
+        ],
+        "title": "PassesResponseUser",
+        "type": "object"
+      },
+      "PasswordUpdatedResponse": {
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "PasswordUpdatedResponse",
+        "type": "object"
+      },
+      "PendingPassesCountResponse": {
+        "properties": {
+          "pending_passes": {
+            "title": "Pending Passes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "pending_passes"
+        ],
+        "title": "PendingPassesCountResponse",
+        "type": "object"
+      },
+      "ReviewSchema": {
+        "properties": {
+          "approved": {
+            "title": "Approved",
+            "type": "boolean"
+          },
+          "reason": {
+            "maxLength": 300,
+            "minLength": 10,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "approved",
+          "reason"
+        ],
+        "title": "ReviewSchema",
+        "type": "object"
+      },
+      "SignUpResponse": {
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "SignUpResponse",
+        "type": "object"
+      },
+      "SignUpUser": {
+        "properties": {
+          "birthdate": {
+            "format": "date",
+            "title": "Birthdate",
+            "type": "string"
+          },
+          "email": {
+            "format": "email",
+            "title": "Email",
+            "type": "string"
+          },
+          "first_name": {
+            "maxLength": 50,
+            "minLength": 2,
+            "title": "First Name",
+            "type": "string"
+          },
+          "last_name": {
+            "maxLength": 50,
+            "minLength": 2,
+            "title": "Last Name",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 16,
+            "minLength": 8,
+            "title": "Password",
+            "type": "string"
+          },
+          "phone_number": {
+            "maxLength": 13,
+            "minLength": 11,
+            "title": "Phone Number",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "first_name",
+          "last_name",
+          "birthdate",
+          "phone_number"
+        ],
+        "title": "SignUpUser",
+        "type": "object"
+      },
+      "UserByHouseResponse": {
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserListItem"
+          }
+        },
+        "required": [
+          "user"
+        ],
+        "title": "UserByHouseResponse",
+        "type": "object"
+      },
+      "UserListItem": {
+        "properties": {
+          "email": {
+            "format": "email",
+            "title": "Email",
+            "type": "string"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "house_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Id"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
+          }
+        },
+        "required": [
+          "email",
+          "full_name",
+          "enabled"
+        ],
+        "title": "UserListItem",
+        "type": "object"
+      },
+      "UserListResponse": {
+        "properties": {
+          "has_next": {
+            "title": "Has Next",
+            "type": "boolean"
+          },
+          "next_page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Page"
+          },
+          "users": {
+            "items": {
+              "$ref": "#/components/schemas/UserListItem"
+            },
+            "title": "Users",
+            "type": "array"
+          }
+        },
+        "required": [
+          "users",
+          "has_next"
+        ],
+        "title": "UserListResponse",
+        "type": "object"
+      },
+      "UserNamePhone": {
+        "properties": {
+          "first_name": {
+            "anyOf": [
+              {
+                "maxLength": 50,
+                "minLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "maxLength": 50,
+                "minLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "phone_number": {
+            "anyOf": [
+              {
+                "maxLength": 13,
+                "minLength": 11,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number"
+          }
+        },
+        "title": "UserNamePhone",
+        "type": "object"
+      },
+      "UserPagesResponse": {
+        "properties": {
+          "total_pages": {
+            "title": "Total Pages",
+            "type": "integer"
+          },
+          "total_users": {
+            "title": "Total Users",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_pages",
+          "total_users"
+        ],
+        "title": "UserPagesResponse",
+        "type": "object"
+      },
+      "UserPasswordUpdate": {
+        "properties": {
+          "new_password": {
+            "maxLength": 16,
+            "minLength": 8,
+            "title": "New Password",
+            "type": "string"
+          },
+          "old_password": {
+            "maxLength": 16,
+            "minLength": 8,
+            "title": "Old Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "old_password",
+          "new_password"
+        ],
+        "title": "UserPasswordUpdate",
+        "type": "object"
+      },
+      "UserProfileResponse": {
+        "properties": {
+          "Hi": {
+            "title": "Hi",
+            "type": "string"
+          },
+          "email": {
+            "format": "email",
+            "title": "Email",
+            "type": "string"
+          },
+          "house_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Id"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
+          }
+        },
+        "required": [
+          "Hi",
+          "email",
+          "role",
+          "house_id"
+        ],
+        "title": "UserProfileResponse",
+        "type": "object"
+      },
+      "UserProfileUpdateResponse": {
+        "properties": {
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "phone_number": {
+            "title": "Phone Number",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "full_name",
+          "phone_number"
+        ],
+        "title": "UserProfileUpdateResponse",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "FastAPI",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Returns Hello World.",
+        "operationId": "read_root__get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Read Root"
+      }
+    },
+    "/auth/sign-in": {
+      "post": {
+        "operationId": "sign_in_user_auth_sign_in_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogInUser"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sign In User"
+      }
+    },
+    "/auth/sign-up": {
+      "post": {
+        "operationId": "sign_up_user_auth_sign_up_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignUpUser"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignUpResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sign Up User"
+      }
+    },
+    "/gatehouse/token": {
+      "post": {
+        "description": "Endpoint for gatehouse to get token for authentication.",
+        "operationId": "get_token_gatehouse_token_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Token Gatehouse Token Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Token",
+        "tags": [
+          "Gatehouse"
+        ]
+      }
+    },
+    "/gatehouse/validate_pass/{pass_id}": {
+      "get": {
+        "description": "Endpoint for gatehouse to validate a pass.",
+        "operationId": "validate_pass_gatehouse_validate_pass__pass_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pass_id",
+            "required": true,
+            "schema": {
+              "title": "Pass Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Validate Pass",
+        "tags": [
+          "Gatehouse"
+        ]
+      }
+    },
+    "/houses": {
+      "get": {
+        "operationId": "get_all_houses_houses_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "next_cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Next Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 15,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "address",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Address"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HouseListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get All Houses",
+        "tags": [
+          "Houses"
+        ]
+      },
+      "post": {
+        "operationId": "create_house_houses_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHouse"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HouseRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create House",
+        "tags": [
+          "Houses"
+        ]
+      }
+    },
+    "/houses/{house_id}": {
+      "delete": {
+        "operationId": "delete_house_houses__house_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "house_id",
+            "required": true,
+            "schema": {
+              "title": "House Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete House",
+        "tags": [
+          "Houses"
+        ]
+      },
+      "get": {
+        "operationId": "get_house_houses__house_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "house_id",
+            "required": true,
+            "schema": {
+              "title": "House Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HouseRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get House",
+        "tags": [
+          "Houses"
+        ]
+      }
+    },
+    "/passes": {
+      "get": {
+        "operationId": "get_passes_for_user_passes_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassesResponseList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Passes For User",
+        "tags": [
+          "Passes"
+        ]
+      },
+      "post": {
+        "operationId": "create_simple_pass_passes_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePassesSimple"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassCreatedResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Simple Pass",
+        "tags": [
+          "Passes"
+        ]
+      }
+    },
+    "/passes/all": {
+      "get": {
+        "operationId": "get_all_passes_passes_all_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "next_cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Next Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 15,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassesPageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get All Passes",
+        "tags": [
+          "Passes"
+        ]
+      }
+    },
+    "/passes/days": {
+      "post": {
+        "operationId": "create_pass_for_days_passes_days_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePassesForDays"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassCreatedForDaysResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Pass For Days",
+        "tags": [
+          "Passes"
+        ]
+      }
+    },
+    "/passes/pending": {
+      "get": {
+        "operationId": "get_pending_passes_passes_pending_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PassesResponseUser"
+                  },
+                  "title": "Response Get Pending Passes Passes Pending Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Pending Passes",
+        "tags": [
+          "Passes"
+        ]
+      }
+    },
+    "/passes/pending/count": {
+      "get": {
+        "operationId": "count_pending_passes_passes_pending_count_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PendingPassesCountResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Count Pending Passes",
+        "tags": [
+          "Passes"
+        ]
+      }
+    },
+    "/passes/search": {
+      "get": {
+        "operationId": "search_pass_by_id_passes_search_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "pass_id",
+            "required": true,
+            "schema": {
+              "title": "Pass Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Search Pass By Id Passes Search Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search Pass By Id",
+        "tags": [
+          "Passes"
+        ]
+      }
+    },
+    "/passes/{pass_id}/approve": {
+      "patch": {
+        "operationId": "approve_pass_passes__pass_id__approve_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pass_id",
+            "required": true,
+            "schema": {
+              "title": "Pass Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Approve Pass",
+        "tags": [
+          "Passes"
+        ]
+      }
+    },
+    "/passes/{pass_id}/auto-review": {
+      "patch": {
+        "operationId": "auto_review_pass_passes__pass_id__auto_review_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pass_id",
+            "required": true,
+            "schema": {
+              "title": "Pass Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewSchema"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Auto Review Pass",
+        "tags": [
+          "Passes"
+        ]
+      }
+    },
+    "/passes/{pass_id}/qr": {
+      "get": {
+        "operationId": "get_pass_qr_passes__pass_id__qr_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pass_id",
+            "required": true,
+            "schema": {
+              "title": "Pass Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassQRCodeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Pass Qr",
+        "tags": [
+          "Passes"
+        ]
+      }
+    },
+    "/passes/{pass_id}/reject": {
+      "delete": {
+        "operationId": "reject_pass_passes__pass_id__reject_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pass_id",
+            "required": true,
+            "schema": {
+              "title": "Pass Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "reason",
+            "required": true,
+            "schema": {
+              "title": "Reason",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reject Pass",
+        "tags": [
+          "Passes"
+        ]
+      }
+    },
+    "/profile": {
+      "get": {
+        "operationId": "get_current_user_profile_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Current User",
+        "tags": [
+          "Profile"
+        ]
+      },
+      "patch": {
+        "operationId": "update_profile_info_profile_patch",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserNamePhone"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileUpdateResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Profile Info",
+        "tags": [
+          "Profile"
+        ]
+      }
+    },
+    "/profile/password": {
+      "put": {
+        "operationId": "update_profile_password_profile_password_put",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPasswordUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasswordUpdatedResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Profile Password",
+        "tags": [
+          "Profile"
+        ]
+      }
+    },
+    "/users": {
+      "get": {
+        "operationId": "get_users_users_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Query"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "exclusiveMinimum": 0,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "exclusiveMinimum": 0,
+              "maximum": 100,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Users",
+        "tags": [
+          "Users"
+        ]
+      },
+      "patch": {
+        "operationId": "make_user_admin_users_patch",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "title": "Email",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Make User Admin",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/delete": {
+      "delete": {
+        "operationId": "delete_staff_users_delete_delete",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "title": "Email",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Staff",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/disable": {
+      "patch": {
+        "operationId": "disable_staff_users_disable_patch",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "title": "Email",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Disable Staff",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/enable": {
+      "patch": {
+        "operationId": "enable_staff_users_enable_patch",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "title": "Email",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Enable Staff",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/house": {
+      "get": {
+        "operationId": "get_user_by_house_id_users_house_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "house_id",
+            "required": true,
+            "schema": {
+              "title": "House Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserByHouseResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get User By House Id",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/link": {
+      "patch": {
+        "operationId": "link_house_users_link_patch",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "title": "Email",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "house_id",
+            "required": true,
+            "schema": {
+              "title": "House Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Link House",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/users/pages": {
+      "get": {
+        "operationId": "get_users_pages_users_pages_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Query"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "exclusiveMinimum": 0,
+              "maximum": 100,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "title": "Authorization",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPagesResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Users Pages",
+        "tags": [
+          "Users"
+        ]
+      }
+    }
+  }
+}

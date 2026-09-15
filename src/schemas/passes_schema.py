@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
 from enum import StrEnum
+from typing import Any
 
 from fastapi import HTTPException
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -52,6 +53,32 @@ class PassesResponseUser(BaseModel):
 
 class PassesResponseList(BaseModel):
     passes: list[PassesResponseUser]
+
+
+class PassesPageResponse(BaseModel):
+    passes: list[PassesResponseUser]
+    next_cursor: str | None = None
+    has_next: bool
+
+
+class PassCreatedResponse(BaseModel):
+    message: str
+    pass_obj: dict[str, Any] = Field(alias="pass")
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class PassCreatedForDaysResponse(BaseModel):
+    message: str
+    pass_id: str
+
+
+class PassQRCodeResponse(BaseModel):
+    qr_jpg_code_base64: str
+
+
+class PendingPassesCountResponse(BaseModel):
+    pending_passes: int
 
 
 class ReviewSchema(BaseModel):

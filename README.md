@@ -69,4 +69,4 @@ uv run pytest
 
 ## API Documentation
 
-Open the API documentation [here](src/openapi.json)
+Open the API documentation [here](openapi.json)

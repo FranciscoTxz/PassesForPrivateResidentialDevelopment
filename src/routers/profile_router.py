@@ -1,13 +1,20 @@
 from fastapi import APIRouter, Depends
 
 from commons.auth import get_current_user_info
-from schemas.users_schema import UserInfo, UserNamePhone, UserPasswordUpdate
+from schemas.users_schema import (
+    PasswordUpdatedResponse,
+    UserInfo,
+    UserNamePhone,
+    UserPasswordUpdate,
+    UserProfileResponse,
+    UserProfileUpdateResponse,
+)
 from services.users_service import UserService
 
 router = APIRouter(prefix="/profile", tags=["Profile"])
 
 
-@router.get("", status_code=200)
+@router.get("", status_code=200, response_model=UserProfileResponse)
 def get_current_user(
     user_info: UserInfo = Depends(get_current_user_info()),
 ):
@@ -19,7 +26,7 @@ def get_current_user(
     }
 
 
-@router.patch("", status_code=200)
+@router.patch("", status_code=200, response_model=UserProfileUpdateResponse)
 async def update_profile_info(
     payload: UserNamePhone,
     user_info: UserInfo = Depends(get_current_user_info()),
@@ -33,7 +40,7 @@ async def update_profile_info(
     return result
 
 
-@router.put("/password", status_code=200)
+@router.put("/password", status_code=200, response_model=PasswordUpdatedResponse)
 async def update_profile_password(
     payload: UserPasswordUpdate,
     user_info: UserInfo = Depends(get_current_user_info()),
